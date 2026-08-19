@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Auth;
+namespace App\Services;
 
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -46,6 +46,8 @@ class AuthService
                 'roles' => $user->getRoleNames(),
                 'permissions' => $user->getAllPermissions()->pluck('name'),
             ],
+            'token' => $token,
+            'token_type' => 'Bearer',
         ];
     }
 

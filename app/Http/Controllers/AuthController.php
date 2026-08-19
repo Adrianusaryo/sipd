@@ -5,16 +5,16 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Response\ApiResponse;
-use App\Service\Auth\AuthService;
+use App\Services\AuthService;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
-    public function __construct(protected AuthService $authService) {}
+    public function __construct(protected AuthService $auth_service) {}
 
     public function register(RegisterRequest $request)
     {
-        $result = $this->authService->register($request->validated());
+        $result = $this->auth_service->register($request->validated());
 
         if ($result) {
             return ApiResponse::error(null, 'please follow the rule', 401);
@@ -26,7 +26,7 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
-        $result = $this->authService->login($request->validated());
+        $result = $this->auth_service->login($request->validated());
 
         if (! $result) {
             return ApiResponse::error(null, 'credential salah, tolong dicek sekali lagi', 401);
@@ -37,7 +37,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $this->authService->logout($request->user());
+        $this->auth_service->logout($request->user());
 
         return ApiResponse::success(null, 'logout success', 200);
     }
