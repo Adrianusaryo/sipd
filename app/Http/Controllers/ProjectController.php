@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Project\ProjectRequest;
+use App\Http\Requests\Project\ProjectUpdateRequest;
 use App\Http\Response\ApiResponse;
+use App\Models\Project;
 use App\Services\ProjectService;
 
 class ProjectController extends Controller
@@ -26,5 +28,19 @@ class ProjectController extends Controller
         }
 
         return ApiResponse::success($result, 'success create project', 201);
+    }
+
+    public function update(ProjectUpdateRequest $request, Project $project)
+    {
+        $result = $this->project_service->updateProject($project, $request->validated());
+
+        return ApiResponse::success($result, 'success update project', 200);
+    }
+
+    public function remove(Project $project)
+    {
+        $this->project_service->removeProject($project);
+
+        return ApiResponse::success(null, 'success remove project', 200);
     }
 }

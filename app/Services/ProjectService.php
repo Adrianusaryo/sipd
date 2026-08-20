@@ -12,6 +12,11 @@ class ProjectService
     // Cache Key
     protected string $cachceKey = 'active_projects_list';
 
+    private function clearProjectCache(): void
+    {
+        Cache::forget($this->cachceKey);
+    }
+
     public function showAllProject(): array
     {
         return Cache::remember($this->cachceKey, now()->addDay(), function () {
@@ -31,9 +36,35 @@ class ProjectService
                 'is_active' => true,
             ]);
 
-            Cache::forget($this->cachceKey);
+            $this->clearProjectCache();
 
             return $project;
+        });
+    }
+
+    public function updateProject(Project $project, array $data): Project
+    {
+        return DB::transaction(function () use ($project, $data) {
+            $project->update([
+                'title' => $data['title'] ?? $project->title,
+                'description' => $data['description'] ?? $project->description,
+                'is_active' => $data['is_active'] ?? $project->is_active,
+            ]);
+
+            $this->clearProjectCache();
+
+            return $project;
+        });
+    }
+
+    public function removeProject(Project $project): bool
+    {
+        return DB::transaction(function () use ($project) {
+            $result = $project->delete();
+
+            $this->clearProjectCache();
+
+            return $result;
         });
     }
 }

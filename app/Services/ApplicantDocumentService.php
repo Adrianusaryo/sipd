@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\ApplicantDocument;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use illuminate\Support\Str;
+use Illuminate\Support\Str;
 
 class ApplicantDocumentService
 {
