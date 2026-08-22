@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('documents_request', function (Blueprint $table) {
+        Schema::create('documents', function (Blueprint $table) {
             $table->id();
             $table->string('number_registration')->unique();
 
@@ -23,9 +23,7 @@ return new class extends Migration
             $table->text('description')->nullable();
 
             $table->enum('status', [
-                'draft',
                 'submitted',
-                'under_review',
                 'revision',
                 'approved',
                 'rejected',
@@ -49,6 +47,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('documents_request');
+        Schema::dropIfExists('documents');
     }
 };

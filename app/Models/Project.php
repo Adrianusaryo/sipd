@@ -20,6 +20,6 @@ class Project extends Model
 
     public function applicantDocuments(): HasMany
     {
-        return $this->hasMany(ApplicantDocument::class, 'project_id');
+        return $this->hasMany(Document::class, 'project_id');
     }
 }

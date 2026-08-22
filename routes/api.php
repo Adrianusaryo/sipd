@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ProjectController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -23,6 +24,20 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/', [ProjectController::class, 'store']);
             Route::put('/{project}', [ProjectController::class, 'update']);
             Route::delete('/{project}', [ProjectController::class, 'remove']);
+        });
+
+        Route::prefix('documents')->group(function () {
+            // Route::get('/', [DocumentController::class, 'show']);
+            Route::post('/', [DocumentController::class, 'store']);
+            Route::put('/{document}/applicant', [DocumentController::class, 'updateByApplicant']);
+            // Route::delete('/{project}', [ProjectController::class, 'remove']);
+
+        });
+    });
+
+    Route::middleware('role:verificator')->group(function () {
+        Route::prefix('documents')->group(function () {
+            Route::put('/{document}/verificator', [DocumentController::class, 'updateByVerificator']);
         });
     });
 });

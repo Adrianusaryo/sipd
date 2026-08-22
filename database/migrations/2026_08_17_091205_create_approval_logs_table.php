@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('approval_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('applicant_id')->constrained('documents_request')->cascadeOnDelete();
+            $table->foreignId('applicant_id')->constrained('documents')->cascadeOnDelete();
             $table->foreignId('actor_id')->constrained('users')->cascadeOnDelete();
             $table->string('action');
             $table->string('status_from')->nullable();

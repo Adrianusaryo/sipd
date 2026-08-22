@@ -11,7 +11,7 @@ class ApprovalLog extends Model
 {
     public function applicant(): BelongsTo
     {
-        return $this->belongsTo(ApplicantDocument::class, 'applicant_id');
+        return $this->belongsTo(Document::class, 'applicant_id');
     }
 
     public function actor(): BelongsTo
