@@ -2,7 +2,7 @@
 
 namespace App\Notifications;
 
-use App\Models\ApplicantDocument;
+use App\Models\Document;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -13,7 +13,7 @@ class DocumentStatusUpdatedNotification extends Notification implements ShouldQu
     use Queueable;
 
     public function __construct(
-        public ApplicantDocument $document,
+        public Document $document,
         public string $type // 'submitted' (ke verifikator) atau 'verified' (ke pemohon)
     ) {}
 

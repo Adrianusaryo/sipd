@@ -20,14 +20,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:applicant')->group(function () {
         // Master Project
         Route::prefix('projects')->group(function () {
-            Route::get('/', [ProjectController::class, 'show']);
+            Route::get('/', [ProjectController::class, 'index']);
             Route::post('/', [ProjectController::class, 'store']);
             Route::put('/{project}', [ProjectController::class, 'update']);
             Route::delete('/{project}', [ProjectController::class, 'remove']);
         });
 
         Route::prefix('documents')->group(function () {
-            // Route::get('/', [DocumentController::class, 'show']);
+            Route::get('/', [DocumentController::class, 'index']);
             Route::post('/', [DocumentController::class, 'store']);
             Route::put('/{document}/applicant', [DocumentController::class, 'updateByApplicant']);
             // Route::delete('/{project}', [ProjectController::class, 'remove']);

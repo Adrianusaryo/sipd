@@ -10,17 +10,27 @@ use Illuminate\Support\Str;
 class ProjectService
 {
     // Cache Key
-    protected string $cachceKey = 'active_projects_list';
+    protected string $cacheKey = 'active_projects_list';
 
     private function clearProjectCache(): void
     {
-        Cache::forget($this->cachceKey);
+        DB::table('cache')->where('key', 'like', config('cache.prefix').$this->cacheKey.'%')->delete();
     }
 
-    public function showAllProject(): array
+    public function showProject(int $perPage = 10, int $page = 1): array
     {
-        return Cache::remember($this->cachceKey, now()->addDay(), function () {
-            return Project::where('is_active', true)->orderBy('created_at', 'desc')->get()->toArray();
+        $dynamicKey = "{$this->cacheKey}_page_{$page}_per_{$perPage}";
+
+        return Cache::remember($dynamicKey, now()->addHours(1), function () use ($perPage) {
+            $paginator = Project::where('is_active', true)->orderBy('created_at', 'asc')->paginate($perPage);
+
+            return [
+                'items' => array_map(fn ($item) => $item->toArray(), $paginator->items()),
+                'total' => $paginator->total(),
+                'perPage' => $paginator->perPage(),
+                'currentPage' => $paginator->currentPage(),
+                'lastPage' => $paginator->lastPage(),
+            ];
         });
     }
 

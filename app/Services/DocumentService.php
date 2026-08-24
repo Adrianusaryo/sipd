@@ -3,10 +3,11 @@
 namespace App\Services;
 
 use App\Events\DocumentStatusUpdateEvent;
-use App\Jobs\ProcessApplicantDocumentJob;
+use App\Jobs\ProcessDocumentJob;
 use App\Models\Document;
 use App\Models\User;
 use App\Notifications\DocumentStatusUpdatedNotification;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
@@ -54,7 +55,7 @@ class DocumentService
             return $request;
         });
 
-        ProcessApplicantDocumentJob::dispatch($result);
+        ProcessDocumentJob::dispatch($result, 'created');
 
         // Notifikasi & Reverb Broadcast
         $verificators = User::role('verificator', 'api')->get();
@@ -63,7 +64,7 @@ class DocumentService
             DocumentStatusUpdateEvent::dispatch(
                 $result,
                 $verificator->id,
-                'Pemohon telah mengajukan dokumen {$result->title}.'
+                "Pemohon telah mengajukan dokumen {$result->title}."
             );
         }
 
@@ -102,7 +103,7 @@ class DocumentService
 
         $this->clearDocumentCache();
 
-        ProcessApplicantDocumentJob::dispatch($document);
+        ProcessDocumentJob::dispatch($document);
 
         return $document->load(['project', 'files']);
     }
@@ -129,10 +130,11 @@ class DocumentService
         });
     }
 
-    // public function showAllRequest(): array
-    // {
-    //     return Cache::remember($this->cacheKey, now()->addDay(), function () {
-    //         return ApplicantDocument::with(['project', 'files', 'applicant'])->latest()->get()->toArray();
-    //     });
-    // }
+    public function showAllRequest(int $perPage = 10): LengthAwarePaginator
+    {
+        return Document::with(['project', 'applicant'])->latest()->paginate($perPage);
+        // return Cache::remember($this->cacheKey, now()->addDay(), function () {
+        //     return ApplicantDocument::with(['project', 'files', 'applicant'])->latest()->get()->toArray();
+        // });
+    }
 }

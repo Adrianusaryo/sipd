@@ -9,17 +9,19 @@ use App\Http\Response\ApiResponse;
 use App\Models\Document;
 use App\Services\DocumentService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class DocumentController extends Controller
 {
     public function __construct(protected DocumentService $document_service) {}
 
-    // public function show()
-    // {
-    //     $result = $this->applicant_service->showAllRequest();
+    public function index(Request $request): JsonResponse
+    {
+        $perPage = $request->query('per_page', 10);
+        $result = $this->document_service->showAllRequest((int) $perPage);
 
-    //     return ApiResponse::success($result, 'success show all documents list', 200);
-    // }
+        return ApiResponse::pagination($result, 'success show all document', 200);
+    }
 
     public function store(DocumentRequest $request): JsonResponse
     {

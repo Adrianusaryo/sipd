@@ -7,16 +7,20 @@ use App\Http\Requests\Project\ProjectUpdateRequest;
 use App\Http\Response\ApiResponse;
 use App\Models\Project;
 use App\Services\ProjectService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
     public function __construct(protected ProjectService $project_service) {}
 
-    public function show()
+    public function index(Request $request): JsonResponse
     {
-        $result = $this->project_service->showAllProject();
+        $perPage = (int) $request->query('per_page', 10);
+        $page = (int) $request->query('page', 1);
+        $result = $this->project_service->showProject($perPage, $page);
 
-        return ApiResponse::success($result, 'success show all projects list', 200);
+        return ApiResponse::pagination($result, 'success show all projects list', 200);
     }
 
     public function store(ProjectRequest $request)
