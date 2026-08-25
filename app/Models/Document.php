@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Override;
 
-#[Fillable(['number_registration', 'project_id', 'applicant_id', 'verificator_id', 'title', 'description', 'status', 'verificator_notes', 'submitted_at', 'approved_at'])]
+#[Fillable(['number_registration', 'project_id', 'applicant_id', 'verificator_id', 'verificator_notes', 'title', 'description', 'status', 'verificator_notes', 'submitted_at', 'approved_at'])]
 class Document extends Model
 {
     protected $table = 'documents';
@@ -46,6 +46,6 @@ class Document extends Model
 
     public function approvalLogs(): HasMany
     {
-        return $this->hasMany(ApprovalLog::class, 'applicant_id')->lastest();
+        return $this->hasMany(ApprovalLog::class, 'document_id')->latest();
     }
 }

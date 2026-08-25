@@ -41,9 +41,11 @@ class DocumentController extends Controller
     {
         $data = $request->validated();
 
+        $user = $request->user();
+
         $files = $request->file('files');
 
-        $result = $this->document_service->updateByApplicant($document, $data, $files);
+        $result = $this->document_service->updateByApplicant($document, $data, $files, $user);
 
         return ApiResponse::success($result, 'success update document', 200);
     }

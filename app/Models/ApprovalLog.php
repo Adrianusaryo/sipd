@@ -6,12 +6,12 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['applicant_id', 'actor_id', 'action', 'status_from', 'status_to', 'notes'])]
+#[Fillable(['document_id', 'actor_id', 'status', 'notes'])]
 class ApprovalLog extends Model
 {
-    public function applicant(): BelongsTo
+    public function document(): BelongsTo
     {
-        return $this->belongsTo(Document::class, 'applicant_id');
+        return $this->belongsTo(Document::class, 'document_id');
     }
 
     public function actor(): BelongsTo

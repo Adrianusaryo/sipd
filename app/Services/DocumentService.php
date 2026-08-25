@@ -64,6 +64,12 @@ class DocumentService
                 ]);
             }
 
+            $request->approvalLogs()->create([
+                'actor_id' => $user->id,
+                'status' => 'submitted',
+                'notes' => 'Create new request document',
+            ]);
+
             return $request;
         });
 
@@ -84,11 +90,10 @@ class DocumentService
         return $result->load(['project', 'files']);
     }
 
-    public function updateByApplicant(Document $document, array $data, ?array $files = null): Document
+    public function updateByApplicant(Document $document, array $data, ?array $files, User $user): Document
     {
-        DB::transaction(function () use ($document, $data, $files) {
+        DB::transaction(function () use ($document, $data, $files, $user) {
             $document->update([
-                'project_id' => $data['project_id'] ?? $document->project_id,
                 'title' => $data['title'] ?? $document->title,
                 'description' => $data['description'] ?? $document->description,
                 'status' => 'submitted',
@@ -100,7 +105,7 @@ class DocumentService
 
                 foreach ($files as $file) {
 
-                    $filePath = $file->store('attachment', 'local');
+                    $filePath = $file->store('attachment', 'public');
 
                     $document->files()->create([
                         'document_type' => $data['document_type'] ?? 'attachment',
@@ -112,6 +117,12 @@ class DocumentService
                     ]);
                 }
             }
+
+            $document->approvalLogs()->create([
+                'actor_id' => $user->id,
+                'status' => 'submitted',
+                'notes' => 'Applicant has resubmitted document request.',
+            ]);
 
         });
 
@@ -127,7 +138,6 @@ class DocumentService
     public function updateByVerificator(Document $document, array $data, User $verificator): Document
     {
         DB::transaction(function () use ($document, $data, $verificator) {
-            $oldStatus = $document->status;
             $newStatus = $data['status'];
 
             $updateData = [
@@ -142,6 +152,12 @@ class DocumentService
 
             $document->update($updateData);
 
+            $document->approvalLogs()->create([
+                'actor_id' => $verificator->id,
+                'status' => $newStatus,
+                'notes' => 'Document status was updated.',
+            ]);
+
         });
 
         $this->clearDocumentCache();
@@ -150,6 +166,6 @@ class DocumentService
             $document, "Verificator has updated status document {$document->title}."
         );
 
-        return $document->load(['project']);
+        return $document->load(['project', 'approvalLogs', 'verificator']);
     }
 }

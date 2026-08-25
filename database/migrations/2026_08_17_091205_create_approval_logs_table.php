@@ -15,14 +15,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('document_id')->constrained('documents')->cascadeOnDelete();
             $table->foreignId('actor_id')->constrained('users')->cascadeOnDelete();
-            $table->string('action');
-            $table->string('status_from')->nullable();
-            $table->string('status_to');
+            $table->string('status');
             $table->text('notes')->nullable();
 
             $table->timestamps();
 
-            $table->index(['applicant_id', 'created_at']);
+            $table->index(['document_id', 'created_at']);
         });
     }
 

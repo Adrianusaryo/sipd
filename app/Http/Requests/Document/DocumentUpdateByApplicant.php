@@ -25,7 +25,6 @@ class DocumentUpdateByApplicant extends FormRequest
     public function rules(): array
     {
         return [
-            'project_id' => ['sometimes', 'required', 'exists:projects,id'],
             'title' => ['sometimes', 'required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'document_type' => ['nullable', 'string', 'max:50'],
