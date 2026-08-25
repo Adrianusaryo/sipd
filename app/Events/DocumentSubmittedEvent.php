@@ -4,24 +4,19 @@ namespace App\Events;
 
 use App\Models\Document;
 use Illuminate\Broadcasting\Channel;
-// use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class DocumentStatusUpdateEvent implements ShouldBroadcastNow
+class DocumentSubmittedEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(
-        public Document $document,
-        public int $recipientUserId,
-        public string $message
-    ) {}
+    public function __construct(public Document $document, public string $message) {}
 
     /**
      * Get the channels the event should broadcast on.
@@ -31,12 +26,20 @@ class DocumentStatusUpdateEvent implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            new Channel('user.'.$this->recipientUserId),
+            new Channel('verificators'),
         ];
     }
 
     public function broadcastAs(): string
     {
-        return 'document.updated';
+        return 'document.submitted';
+    }
+
+    public function broadcastWith(): array
+    {
+        return [
+            'number_registration' => $this->document->number_registration,
+            'message' => $this->message,
+        ];
     }
 }

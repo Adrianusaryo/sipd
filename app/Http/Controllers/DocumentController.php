@@ -17,8 +17,9 @@ class DocumentController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $perPage = $request->query('per_page', 10);
-        $result = $this->document_service->showAllRequest((int) $perPage);
+        $perPage = (int) $request->query('per_page', 10);
+        $page = (int) $request->query('page', 1);
+        $result = $this->document_service->showDocumentRequest($perPage, $page);
 
         return ApiResponse::pagination($result, 'success show all document', 200);
     }

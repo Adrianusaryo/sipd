@@ -2,15 +2,13 @@
 
 namespace App\Services;
 
-use App\Events\DocumentStatusUpdateEvent;
-use App\Jobs\ProcessDocumentJob;
+use App\Events\DocumentResubmittedEvent;
+use App\Events\DocumentStatusUpdatedEvent;
+use App\Events\DocumentSubmittedEvent;
 use App\Models\Document;
 use App\Models\User;
-use App\Notifications\DocumentStatusUpdatedNotification;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 
 class DocumentService
@@ -19,7 +17,24 @@ class DocumentService
 
     private function clearDocumentCache(): void
     {
-        Cache::forget($this->cacheKey);
+        DB::table('cache')->where('key', 'like', config('cache.prefix').$this->cacheKey.'%')->delete();
+    }
+
+    public function showDocumentRequest(int $perPage = 10, int $page = 1): array
+    {
+        $dynamicKey = "{$this->cacheKey}_page_{$page}_per_{$perPage}";
+
+        return Cache::remember($dynamicKey, now()->addHours(1), function () use ($perPage) {
+            $paginator = Document::with(['project', 'files', 'applicant'])->latest()->paginate($perPage);
+
+            return [
+                'items' => array_map(fn ($item) => $item->toArray(), $paginator->items()),
+                'total' => $paginator->total(),
+                'perPage' => $paginator->perPage(),
+                'currentPage' => $paginator->currentPage(),
+                'lastPage' => $paginator->lastPage(),
+            ];
+        });
     }
 
     public function createRequest(array $data, array $files, User $user): Document
@@ -38,7 +53,7 @@ class DocumentService
             ]);
 
             foreach ($files as $file) {
-                $filePath = $file->store('attachment', 'local');
+                $filePath = $file->store('attachment', 'public');
                 $request->files()->create([
                     'document_type' => $data['document_type'] ?? 'attachment',
                     'file_path' => $filePath,
@@ -49,24 +64,22 @@ class DocumentService
                 ]);
             }
 
-            // Clear cache
-            $this->clearDocumentCache();
-
             return $request;
         });
 
-        ProcessDocumentJob::dispatch($result, 'created');
+        // Clear Cache
+        $this->clearDocumentCache();
+
+        // Queue Job
+        // ProcessDocumentJob::dispatch($result, 'created');
 
         // Notifikasi & Reverb Broadcast
         $verificators = User::role('verificator', 'api')->get();
-        Notification::send($verificators, new DocumentStatusUpdatedNotification($result, 'submitted'));
-        foreach ($verificators as $verificator) {
-            DocumentStatusUpdateEvent::dispatch(
-                $result,
-                $verificator->id,
-                "Pemohon telah mengajukan dokumen {$result->title}."
-            );
-        }
+        // Notification::send($verificators, new DocumentStatusUpdatedNotification($result, 'submitted'));
+
+        DocumentSubmittedEvent::dispatch(
+            $result, "Applicant has make a document request {$result->title}."
+        );
 
         return $result->load(['project', 'files']);
     }
@@ -82,9 +95,10 @@ class DocumentService
             ]);
 
             if (! empty($files)) {
+                $lastVersion = $document->files()->max('version') ?? 1;
+                $newVersion = $lastVersion + 1;
+
                 foreach ($files as $file) {
-                    $lastVersion = $document->files()->max('version') ?? 1;
-                    $newVersion = $lastVersion + 1;
 
                     $filePath = $file->store('attachment', 'local');
 
@@ -103,14 +117,16 @@ class DocumentService
 
         $this->clearDocumentCache();
 
-        ProcessDocumentJob::dispatch($document);
+        DocumentResubmittedEvent::dispatch(
+            $document, "Applicant has updated and resubmitted the document {$document->title}."
+        );
 
         return $document->load(['project', 'files']);
     }
 
     public function updateByVerificator(Document $document, array $data, User $verificator): Document
     {
-        return DB::transaction(function () use ($document, $data, $verificator) {
+        DB::transaction(function () use ($document, $data, $verificator) {
             $oldStatus = $document->status;
             $newStatus = $data['status'];
 
@@ -126,15 +142,14 @@ class DocumentService
 
             $document->update($updateData);
 
-            return $document->load(['project', 'files', 'verificator']);
         });
-    }
 
-    public function showAllRequest(int $perPage = 10): LengthAwarePaginator
-    {
-        return Document::with(['project', 'applicant'])->latest()->paginate($perPage);
-        // return Cache::remember($this->cacheKey, now()->addDay(), function () {
-        //     return ApplicantDocument::with(['project', 'files', 'applicant'])->latest()->get()->toArray();
-        // });
+        $this->clearDocumentCache();
+
+        DocumentStatusUpdatedEvent::dispatch(
+            $document, "Verificator has updated status document {$document->title}."
+        );
+
+        return $document->load(['project']);
     }
 }

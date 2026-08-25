@@ -20,7 +20,7 @@ class ProjectController extends Controller
         $page = (int) $request->query('page', 1);
         $result = $this->project_service->showProject($perPage, $page);
 
-        return ApiResponse::pagination($result, 'success show all projects list', 200);
+        return ApiResponse::pagination($result, 'success show all projects', 200);
     }
 
     public function store(ProjectRequest $request)
