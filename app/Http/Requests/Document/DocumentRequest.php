@@ -3,6 +3,52 @@
 namespace App\Http\Requests\Document;
 
 use Illuminate\Foundation\Http\FormRequest;
+use OpenApi\Attributes as OA;
+
+#[OA\Schema(
+    schema: 'DocumentRequest',
+    title: 'Document Request',
+    description: false,
+    required: ['project_id', 'title', 'files[]'],
+    properties: [
+        new OA\Property(
+            property: 'project_id',
+            type: 'integer',
+            example: 1,
+            description: 'ID Project terkait'
+        ),
+        new OA\Property(
+            property: 'title',
+            type: 'string',
+            example: 'Dokumen AMDAL Tahap 1',
+            description: 'Judul Dokumen'
+        ),
+        new OA\Property(
+            property: 'description',
+            type: 'string',
+            nullable: true,
+            example: 'Pengajuan dokumen AMDAL untuk kawasan pesisir.',
+            description: 'Deskripsi tambahan (opsional)'
+        ),
+        new OA\Property(
+            property: 'document_type',
+            type: 'string',
+            nullable: true,
+            example: 'AMDAL',
+            description: 'Tipe Dokumen (opsional)'
+        ),
+        // Array File Upload
+        new OA\Property(
+            property: 'files[]',
+            type: 'array',
+            description: 'Upload 1 atau lebih file (pdf, jpg, jpeg, png, docx. Max: 5MB per file)',
+            items: new OA\Items(
+                type: 'string',
+                format: 'binary'
+            )
+        ),
+    ],
+)]
 
 class DocumentRequest extends FormRequest
 {

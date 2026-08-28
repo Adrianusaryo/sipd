@@ -14,7 +14,7 @@ class AuthService
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
-                'password' => $data['password'],
+                'password' => Hash::make($data['password']),
                 'nip_nik' => $data['nip_nik'],
                 'phone' => $data['phone'],
             ]);
@@ -37,22 +37,13 @@ class AuthService
         $token = $user->createToken('auth_token_sipd')->plainTextToken;
 
         return [
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'nip_nik' => $user->nip_nik,
-                'phone' => $user->phone,
-                'roles' => $user->getRoleNames(),
-                'permissions' => $user->getAllPermissions()->pluck('name'),
-            ],
+            'permissions' => $user->getAllPermissions()->pluck('name'),
             'token' => $token,
-            'token_type' => 'Bearer',
         ];
     }
 
     public function logout(User $user): bool
     {
-        return $user->currentAccessToken()->delete();
+        return (bool) $user->tokens()->delete();
     }
 }

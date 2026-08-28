@@ -1,0 +1,1395 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "SIPD API Documentation",
+        "description": "Dokumentasi API untuk aplikasi SIPD",
+        "contact": {
+            "email": "admin@sipd_new.test"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://sipd_new.test/api/",
+            "description": "Local Server"
+        }
+    ],
+    "paths": {
+        "/auth/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "operationId": "ed42f392010c301892e640067141676e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RegisterRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Response Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "meta": {
+                                            "properties": {
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 201
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "register success"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Joko Widodo"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "jokowi@gmail.com"
+                                                },
+                                                "nip_nik": {
+                                                    "type": "string",
+                                                    "example": "199001012020121004"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "081234567895"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "operationId": "8cb7742ae98d0990acb2907c4e00bf24",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoginRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Response Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "meta": {
+                                            "properties": {
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 200
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "login success"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "permissions": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "example": [
+                                                        "create-request",
+                                                        "view-request"
+                                                    ]
+                                                },
+                                                "token": {
+                                                    "type": "string",
+                                                    "example": "6|3Kgs2B34mqxB22hmHc9W8N2GYXxwg3OTtWT4I4A84756196e"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "operationId": "0d29c740dc06d77602af8095bf4654cc",
+                "responses": {
+                    "200": {
+                        "description": "Response Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "meta": {
+                                            "properties": {
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 200
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "logout success"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": null,
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/documents/applicant": {
+            "get": {
+                "tags": [
+                    "Applicant"
+                ],
+                "operationId": "1b9ef096190207fb152d8120839ad209",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Response Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "meta": {
+                                            "properties": {
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 200
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "success get all project"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": "1"
+                                                    },
+                                                    "code_project": {
+                                                        "type": "string",
+                                                        "example": "PRJ-20260827-WL0R"
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Kampung Nelayan Merah Putih"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Pengajuan izin analisis dampak pembangunan program Kampung Nelayan Merah Putih."
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 20
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 4
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Response Failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "meta": {
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Unprocessable Entity"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": null,
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/documents/verificator": {
+            "get": {
+                "tags": [
+                    "Verificator"
+                ],
+                "operationId": "9b9749026de3b6466a4ee448cb153a27",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Response Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "meta": {
+                                            "properties": {
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 200
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "success get all documents"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": "1"
+                                                    },
+                                                    "code_project": {
+                                                        "type": "string",
+                                                        "example": "PRJ-20260827-WL0R"
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Kampung Nelayan Merah Putih"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Pengajuan izin analisis dampak pembangunan program Kampung Nelayan Merah Putih."
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 20
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 4
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Response Failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "meta": {
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Unprocessable Entity"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": null,
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/documents": {
+            "post": {
+                "tags": [
+                    "Applicant"
+                ],
+                "operationId": "1c3ad2906b68a58de1f603260ab271c4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DocumentRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Response Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "meta": {
+                                            "properties": {
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 200
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "success get all project"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": "1"
+                                                    },
+                                                    "code_project": {
+                                                        "type": "string",
+                                                        "example": "PRJ-20260827-WL0R"
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Kampung Nelayan Merah Putih"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Pengajuan izin analisis dampak pembangunan program Kampung Nelayan Merah Putih."
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 20
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 4
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Response Failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "meta": {
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Unprocessable Entity"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": null,
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/documents/{document}": {
+            "put": {
+                "tags": [
+                    "Applicant"
+                ],
+                "operationId": "0507a0de91fd47babadd2f116ba9b730",
+                "parameters": [
+                    {
+                        "name": "document",
+                        "in": "path",
+                        "description": "ID Dokumen yang sedang direvisi",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 3
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DocumentRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Response Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "meta": {
+                                            "properties": {
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 200
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "success get all project"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": "1"
+                                                    },
+                                                    "code_project": {
+                                                        "type": "string",
+                                                        "example": "PRJ-20260827-WL0R"
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Kampung Nelayan Merah Putih"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Pengajuan izin analisis dampak pembangunan program Kampung Nelayan Merah Putih."
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 20
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 4
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Response Failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "meta": {
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Unprocessable Entity"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": null,
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/documents/{id}/verificator": {
+            "put": {
+                "tags": [
+                    "Verificator"
+                ],
+                "operationId": "9a91583da2d0ee547fc7343199e508e9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DocumentUpdateRequestVerificator"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Response Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "meta": {
+                                            "properties": {
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 201
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "success update status"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": "1"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Pengajuan izin analisis dampak pembangunan program Kampung Nelayan Merah Putih."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Response Failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "meta": {
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "unauthenticated"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": null,
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Response Failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "meta": {
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "project not found"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": null,
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Response Failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "meta": {
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "unprocessable entity"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": null,
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/projects": {
+            "get": {
+                "tags": [
+                    "Project"
+                ],
+                "operationId": "07f276c6e629646d087ee4b728e1234c",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Response Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "meta": {
+                                            "properties": {
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 200
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "success show all project"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": "1"
+                                                    },
+                                                    "code_project": {
+                                                        "type": "string",
+                                                        "example": "PRJ-20260827-WL0R"
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Kampung Nelayan Merah Putih"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Pengajuan izin analisis dampak pembangunan program Kampung Nelayan Merah Putih."
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 20
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 4
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Project"
+                ],
+                "operationId": "d91af95183d5934b42aec1325d5165db",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProjectRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Response Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "meta": {
+                                            "properties": {
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 201
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "create project success"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": "1"
+                                                },
+                                                "code_project": {
+                                                    "type": "string",
+                                                    "example": "PRJ-20260827-WL0R"
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Kampung Nelayan Merah Putih"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Pengajuan izin analisis dampak pembangunan program Kampung Nelayan Merah Putih."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/projects/{id}": {
+            "put": {
+                "tags": [
+                    "Project"
+                ],
+                "operationId": "546bd69cc1e45c7e4a50c3da131d0969",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProjectRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Response Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "meta": {
+                                            "properties": {
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 201
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "success update project"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": "1"
+                                                },
+                                                "code_project": {
+                                                    "type": "string",
+                                                    "example": "PRJ-20260827-WL0R"
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Kampung Nelayan Merah Putih"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Pengajuan izin analisis dampak pembangunan program Kampung Nelayan Merah Putih."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Project"
+                ],
+                "operationId": "650fd22a9e728f1de77f375a5ec4e414",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Response Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "meta": {
+                                            "properties": {
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 201
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "success remove project"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": null,
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "LoginRequest": {
+                "title": "Login Request",
+                "description": "",
+                "properties": {
+                    "identifier": {
+                        "type": "string",
+                        "example": "Joko Widodo"
+                    },
+                    "password": {
+                        "type": "string",
+                        "example": "Password123$"
+                    }
+                },
+                "type": "object"
+            },
+            "RegisterRequest": {
+                "title": "Register Request",
+                "description": "",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Joko Widodo"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "jokowi@gmail.com"
+                    },
+                    "password": {
+                        "type": "string",
+                        "example": "Password123$"
+                    },
+                    "password_confirmation": {
+                        "type": "string",
+                        "example": "Password123$"
+                    },
+                    "nip_nik": {
+                        "type": "string",
+                        "example": "199001012020121004"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "081234567895"
+                    }
+                },
+                "type": "object"
+            },
+            "DocumentRequest": {
+                "title": "Document Request",
+                "description": "",
+                "required": [
+                    "project_id",
+                    "title",
+                    "files[]"
+                ],
+                "properties": {
+                    "project_id": {
+                        "description": "ID Project terkait",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "description": "Judul Dokumen",
+                        "type": "string",
+                        "example": "Dokumen AMDAL Tahap 1"
+                    },
+                    "description": {
+                        "description": "Deskripsi tambahan (opsional)",
+                        "type": "string",
+                        "example": "Pengajuan dokumen AMDAL untuk kawasan pesisir.",
+                        "nullable": true
+                    },
+                    "document_type": {
+                        "description": "Tipe Dokumen (opsional)",
+                        "type": "string",
+                        "example": "AMDAL",
+                        "nullable": true
+                    },
+                    "files[]": {
+                        "description": "Upload 1 atau lebih file (pdf, jpg, jpeg, png, docx. Max: 5MB per file)",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "binary"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "DocumentUpdateRequestApplicant": {
+                "title": "Document Request",
+                "description": "",
+                "required": [
+                    "project_id",
+                    "title",
+                    "files[]"
+                ],
+                "properties": {
+                    "project_id": {
+                        "description": "ID Project terkait",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "description": "Judul Dokumen",
+                        "type": "string",
+                        "example": "Dokumen AMDAL Tahap 1"
+                    },
+                    "description": {
+                        "description": "Deskripsi tambahan (opsional)",
+                        "type": "string",
+                        "example": "Pengajuan dokumen AMDAL untuk kawasan pesisir.",
+                        "nullable": true
+                    },
+                    "document_type": {
+                        "description": "Tipe Dokumen (opsional)",
+                        "type": "string",
+                        "example": "AMDAL",
+                        "nullable": true
+                    },
+                    "files[]": {
+                        "description": "Upload 1 atau lebih file (pdf, jpg, jpeg, png, docx. Max: 5MB per file)",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "binary"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "DocumentUpdateRequestVerificator": {
+                "title": "Document Update Request Verificator",
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "example": "approved",
+                        "enum": [
+                            "approved",
+                            "revision",
+                            "rejected"
+                        ]
+                    },
+                    "verificator_notes": {
+                        "type": "string",
+                        "example": "Dokumen AMDAL sudah lengkap dan disetujui.",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "ProjectRequest": {
+                "title": "Project Request",
+                "description": "",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "example": "Kampung Nelayan Merah Putih"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Pengajuan izin analisis dampak pembangunan Kampung Nelayan Merah Putih."
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "Sanctum Token"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": ""
+        },
+        {
+            "name": "Project",
+            "description": ""
+        },
+        {
+            "name": "Applicant",
+            "description": ""
+        },
+        {
+            "name": "Verificator",
+            "description": ""
+        }
+    ],
+    "security": [
+        {
+            "bearerAuth": []
+        }
+    ]
+}

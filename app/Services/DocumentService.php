@@ -15,17 +15,36 @@ class DocumentService
 {
     protected string $cacheKey = 'applicant_document_all';
 
+    public function __construct(protected ApprovalLogsService $logService) {}
+
     private function clearDocumentCache(): void
     {
         DB::table('cache')->where('key', 'like', config('cache.prefix').$this->cacheKey.'%')->delete();
     }
 
-    public function showDocumentRequest(int $perPage = 10, int $page = 1): array
+    public function showDocumentByVerificator(int $perPage = 10, int $page = 1): array
     {
         $dynamicKey = "{$this->cacheKey}_page_{$page}_per_{$perPage}";
 
         return Cache::remember($dynamicKey, now()->addHours(1), function () use ($perPage) {
             $paginator = Document::with(['project', 'files', 'applicant'])->latest()->paginate($perPage);
+
+            return [
+                'items' => array_map(fn ($item) => $item->toArray(), $paginator->items()),
+                'total' => $paginator->total(),
+                'perPage' => $paginator->perPage(),
+                'currentPage' => $paginator->currentPage(),
+                'lastPage' => $paginator->lastPage(),
+            ];
+        });
+    }
+
+    public function showDocumentByApplicant(int $userId, int $perPage = 10, int $page = 1): array
+    {
+        $dynamicKey = "{$this->cacheKey}_user_{$userId}_page_{$page}_per_{$perPage}";
+
+        return Cache::remember($dynamicKey, now()->addHours(1), function () use ($userId, $perPage) {
+            $paginator = Document::with(['project', 'files'])->where('applicant_id', $userId)->latest()->paginate($perPage);
 
             return [
                 'items' => array_map(fn ($item) => $item->toArray(), $paginator->items()),
@@ -75,6 +94,7 @@ class DocumentService
 
         // Clear Cache
         $this->clearDocumentCache();
+        $this->logService->clearLogCache();
 
         // Queue Job
         // ProcessDocumentJob::dispatch($result, 'created');
@@ -127,6 +147,7 @@ class DocumentService
         });
 
         $this->clearDocumentCache();
+        $this->logService->clearLogCache();
 
         DocumentResubmittedEvent::dispatch(
             $document, "Applicant has updated and resubmitted the document {$document->title}."
@@ -143,7 +164,7 @@ class DocumentService
             $updateData = [
                 'status' => $newStatus,
                 'verificator_id' => $verificator->id,
-                'verificator_notes' => $data['notes'] ?? null,
+                'verificator_notes' => $data['verificator_notes'] ?? null,
             ];
 
             if ($newStatus === 'approved') {
@@ -161,6 +182,7 @@ class DocumentService
         });
 
         $this->clearDocumentCache();
+        $this->logService->clearLogCache();
 
         DocumentStatusUpdatedEvent::dispatch(
             $document, "Verificator has updated status document {$document->title}."

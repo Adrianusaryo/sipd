@@ -9,10 +9,11 @@ class ApiResponse
         return response()->json(
             [
                 'meta' => [
+                    'status' => $status,
                     'message' => $message,
                 ],
                 'data' => $data,
-            ], $status
+            ]
         );
     }
 
@@ -20,16 +21,18 @@ class ApiResponse
     {
         return response()->json([
             'meta' => [
+                'status' => $status,
                 'message' => $message,
             ],
             'data' => $data,
-        ], $status);
+        ]);
     }
 
     public static function pagination(array $result, string $message = 'pagination', int $status = 200)
     {
         return response()->json([
             'meta' => [
+                'status' => $status,
                 'message' => $message,
             ],
             'data' => $result['items'],
@@ -39,6 +42,6 @@ class ApiResponse
                 'current_page' => $result['currentPage'],
                 'last_page' => $result['lastPage'],
             ],
-        ], $status);
+        ]);
     }
 }

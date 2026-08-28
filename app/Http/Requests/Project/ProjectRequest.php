@@ -3,6 +3,17 @@
 namespace App\Http\Requests\Project;
 
 use Illuminate\Foundation\Http\FormRequest;
+use OpenApi\Attributes as OA;
+
+#[OA\Schema(
+    schema: 'ProjectRequest',
+    title: 'Project Request',
+    description: false,
+    properties: [
+        new OA\Property(property: 'title', type: 'string', example: 'Kampung Nelayan Merah Putih'),
+        new OA\Property(property: 'description', type: 'string', example: 'Pengajuan izin analisis dampak pembangunan Kampung Nelayan Merah Putih.'),
+    ]
+)]
 
 class ProjectRequest extends FormRequest
 {
