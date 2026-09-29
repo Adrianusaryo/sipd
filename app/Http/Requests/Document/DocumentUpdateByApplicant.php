@@ -8,7 +8,7 @@ use OpenApi\Attributes as OA;
 
 #[OA\Schema(
     schema: 'DocumentUpdateRequestApplicant',
-    title: 'Document Request',
+    title: 'Document Update Request Applicant',
     description: false,
     required: ['project_id', 'title', 'files[]'],
     properties: [
@@ -60,7 +60,7 @@ class DocumentUpdateByApplicant extends FormRequest
     {
         $document = $this->route('document');
 
-        return $document->applicant_id === $this->user()->id && in_array($document->status, [DocumentStatus::REVISION, DocumentStatus::REJECTED]);
+        return $document->applicant_id === $this->user()->id && $document->status === DocumentStatus::REVISION;
     }
 
     /**

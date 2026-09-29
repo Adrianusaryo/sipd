@@ -15,9 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('number_registration')->unique();
 
-            $table->foreignId('project_id')->constrained('projects')->cascadeOnDelete();
-            $table->foreignId('applicant_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('verificator_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('admin_id')->nullable()->constrained('users')->nullOnDelete();
 
             $table->string('title');
             $table->text('description')->nullable();
@@ -29,14 +28,14 @@ return new class extends Migration
                 'rejected',
             ])->default('submitted');
 
-            $table->text('verificator_notes')->nullable();
+            $table->text('admin_notes')->nullable();
             $table->timestamp('submitted_at')->nullable();
             $table->timestamp('approved_at')->nullable();
 
             $table->timestamps();
 
-            $table->index(['status', 'applicant_id']);
-            $table->index(['status', 'verificator_id']);
+            $table->index(['status', 'user_id']);
+            $table->index(['status', 'admin_id']);
             $table->index('created_at');
 
         });

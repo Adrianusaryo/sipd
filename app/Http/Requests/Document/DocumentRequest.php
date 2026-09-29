@@ -9,14 +9,7 @@ use OpenApi\Attributes as OA;
     schema: 'DocumentRequest',
     title: 'Document Request',
     description: false,
-    required: ['project_id', 'title', 'files[]'],
     properties: [
-        new OA\Property(
-            property: 'project_id',
-            type: 'integer',
-            example: 1,
-            description: 'ID Project terkait'
-        ),
         new OA\Property(
             property: 'title',
             type: 'string',
@@ -68,7 +61,6 @@ class DocumentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'project_id' => ['required', 'integer', 'exists:projects,id'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'document_type' => ['nullable', 'string', 'max:50'],

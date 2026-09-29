@@ -37,14 +37,14 @@ class RoleAndPermissionSeeder extends Seeder
         // Make Roles and Assign Permission
 
         // Role : Applicant
-        $roleApplicant = Role::findOrCreate('applicant', 'api');
+        $roleApplicant = Role::findOrCreate('user', 'api');
         $roleApplicant->givePermissionTo([
             'create-request',
             'view-request',
         ]);
 
         // Role : verificator
-        $roleVerificator = Role::findOrCreate('verificator', 'api');
+        $roleVerificator = Role::findOrCreate('admin', 'api');
         $roleVerificator->givePermissionTo([
             'view-all-request',
             'review-request',
@@ -53,7 +53,7 @@ class RoleAndPermissionSeeder extends Seeder
         ]);
 
         // Role : Admin
-        $roleAdmin = Role::findOrCreate('admin', 'api');
+        $roleAdmin = Role::findOrCreate('super_admin', 'api');
         $roleAdmin->givePermissionTo(Permission::all());
     }
 }

@@ -13,10 +13,10 @@ class ApprovalLogController extends Controller
 
     public function index(Request $request): JsonResponse
     {
+        $limit = (int) $request->query('limit', 10);
         $page = (int) $request->query('page', 1);
-        $perPage = (int) $request->query('per_page', 10);
 
-        $logs = $this->logService->getLogsByUser($request->user(), $page, $perPage);
+        $logs = $this->logService->getLogsByUser($request->user(), $page, $limit);
 
         return ApiResponse::pagination($logs, 'success get all logs');
     }

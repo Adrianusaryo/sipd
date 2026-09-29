@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Resources\Auth\LoginResource;
 use App\Http\Response\ApiResponse;
 use App\Services\AuthService;
+use App\Swagger\ApiErrorDoc;
 use App\Swagger\ApiSuccessDoc;
 use App\Swagger\JsonSchemaRef;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
@@ -25,7 +28,7 @@ class AuthController extends Controller
         ),
         responses: [
             new ApiSuccessDoc(201, 'register success', [
-                new OA\Property(property: 'name', type: 'string', example: 'Joko Widodo'),
+                new OA\Property(property: 'username', type: 'string', example: 'Joko Widodo'),
                 new OA\Property(property: 'email', type: 'string', example: 'jokowi@gmail.com'),
                 new OA\Property(property: 'nip_nik', type: 'string', example: '199001012020121004'),
                 new OA\Property(property: 'phone', type: 'string', example: '081234567895'),
@@ -52,17 +55,18 @@ class AuthController extends Controller
                 new OA\Property(property: 'permissions', type: 'array', items: new OA\Items(type: 'string'), example: ['create-request', 'view-request']),
                 new OA\Property(property: 'token', type: 'string', example: '6|3Kgs2B34mqxB22hmHc9W8N2GYXxwg3OTtWT4I4A84756196e'),
             ]),
+            new ApiErrorDoc(400, 'login failed, please check your credential'),
         ]
     )]
-    public function login(LoginRequest $request)
+    public function login(LoginRequest $request): JsonResponse
     {
         $result = $this->auth_service->login($request->validated());
 
         if (! $result) {
-            return ApiResponse::error(null, 'login failed, please check again credential', 400);
+            return ApiResponse::error(null, 'login failed, please check again credential', 401);
         }
 
-        return ApiResponse::success($result, 'login success', 200);
+        return ApiResponse::success(new LoginResource($result), 'login success', 200);
     }
 
     // Logout

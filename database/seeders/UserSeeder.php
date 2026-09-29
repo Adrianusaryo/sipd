@@ -17,44 +17,44 @@ class UserSeeder extends Seeder
         $guard = 'api';
 
         // 1. Ambil atau buat role jika belum ada
+        $roleSuperAdmin = Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => $guard]);
         $roleAdmin = Role::firstOrCreate(['name' => 'admin', 'guard_name' => $guard]);
-        $roleVerificator = Role::firstOrCreate(['name' => 'verificator', 'guard_name' => $guard]);
-        $roleApplicant = Role::firstOrCreate(['name' => 'applicant', 'guard_name' => $guard]);
+        $roleUser = Role::firstOrCreate(['name' => 'user', 'guard_name' => $guard]);
 
         // 2. Akun Admin
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@sipd.go.id'],
+        $superAdmin = User::firstOrCreate(
+            ['email' => 'superadmin@sipd.go.id'],
             [
-                'name' => 'Administrator SIPD',
+                'username' => 'Super Admin SIPD',
                 'password' => Hash::make('password123'),
                 'nip_nik' => '199001012020121001',
                 'phone' => '081234567890',
             ]
         );
-        $admin->syncRoles([$roleAdmin]);
+        $superAdmin->syncRoles([$roleSuperAdmin]);
 
         // 3. Akun Penilai / Verifikator
-        $verificator = User::firstOrCreate(
-            ['email' => 'verificator@sipd.go.id'],
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@sipd.go.id'],
             [
-                'name' => 'Verificator',
+                'username' => 'Admin SIPD',
                 'password' => Hash::make('password123'),
                 'nip_nik' => '198505152015031002',
                 'phone' => '081298765432',
             ]
         );
-        $verificator->syncRoles([$roleVerificator]);
+        $admin->syncRoles([$roleAdmin]);
 
         // 4. Akun Pemohon
-        $applicant = User::firstOrCreate(
-            ['email' => 'applicant@sipd.go.id'],
+        $user = User::firstOrCreate(
+            ['email' => 'rajajawa@sipd.go.id'],
             [
-                'name' => 'Raja Jawa',
+                'username' => 'Raja Jawa',
                 'password' => Hash::make('password123'),
                 'nip_nik' => '3173012345670001',
                 'phone' => '085712345678',
             ]
         );
-        $applicant->syncRoles([$roleApplicant]);
+        $user->syncRoles([$roleUser]);
     }
 }

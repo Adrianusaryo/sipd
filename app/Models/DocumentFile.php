@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 use Override;
 
-#[Fillable(['applicant_id', 'document_type', 'verificator_notes', 'file_path', 'file_name', 'file_mime', 'file_size', 'version'])]
+#[Fillable(['user_id', 'document_type', 'verificator_notes', 'file_path', 'file_name', 'file_mime', 'file_size', 'version'])]
 class DocumentFile extends Model
 {
     protected $table = 'documents_files';
@@ -22,9 +22,9 @@ class DocumentFile extends Model
         ];
     }
 
-    public function applicant(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Document::class, 'applicant_id');
+        return $this->belongsTo(Document::class, 'user_id');
     }
 
     public function getFileUrlAttribute(): string

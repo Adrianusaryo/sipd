@@ -9,7 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Override;
 
-#[Fillable(['number_registration', 'project_id', 'applicant_id', 'verificator_id', 'verificator_notes', 'title', 'description', 'status', 'verificator_notes', 'submitted_at', 'approved_at'])]
+#[Fillable(['number_registration', 'user_id', 'admin_id',  'title', 'description', 'status', 'admin_notes', 'submitted_at', 'approved_at'])]
+
 class Document extends Model
 {
     protected $table = 'documents';
@@ -24,24 +25,19 @@ class Document extends Model
         ];
     }
 
-    public function project(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Project::class, 'project_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function applicant(): BelongsTo
+    public function admin(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'applicant_id');
-    }
-
-    public function verificator(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'verificator_id');
+        return $this->belongsTo(User::class, 'admin_id');
     }
 
     public function files(): HasMany
     {
-        return $this->hasMany(DocumentFile::class, 'applicant_id');
+        return $this->hasMany(DocumentFile::class, 'document_id');
     }
 
     public function approvalLogs(): HasMany

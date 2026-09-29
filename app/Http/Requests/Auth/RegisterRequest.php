@@ -10,7 +10,7 @@ use OpenApi\Attributes as OA;
     title: 'Register Request',
     description: false,
     properties: [
-        new OA\Property(property: 'name', type: 'string', example: 'Joko Widodo'),
+        new OA\Property(property: 'username', type: 'string', example: 'Joko Widodo'),
         new OA\Property(property: 'email', type: 'string', example: 'jokowi@gmail.com'),
         new OA\Property(property: 'password', type: 'string', example: 'Password123$'),
         new OA\Property(property: 'password_confirmation', type: 'string', example: 'Password123$'),
@@ -37,7 +37,7 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email'],
             'password' => ['required', 'string', 'min:6', 'regex:/[a-z]/', 'regex:/[A-Z]/', 'regex:/[0-9]/', 'confirmed'],
             'nip_nik' => ['required', 'string', 'numeric', 'unique:users,nip_nik'],

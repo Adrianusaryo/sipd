@@ -5,15 +5,16 @@ namespace App\Services;
 use App\Events\DocumentResubmittedEvent;
 use App\Events\DocumentStatusUpdatedEvent;
 use App\Events\DocumentSubmittedEvent;
+use App\Helpers\DocumentHelper;
+use App\Helpers\PaginationHelper;
 use App\Models\Document;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class DocumentService
 {
-    protected string $cacheKey = 'applicant_document_all';
+    protected string $cacheKey = 'show_document';
 
     public function __construct(protected ApprovalLogsService $logService) {}
 
@@ -22,49 +23,43 @@ class DocumentService
         DB::table('cache')->where('key', 'like', config('cache.prefix').$this->cacheKey.'%')->delete();
     }
 
-    public function showDocumentByVerificator(int $perPage = 10, int $page = 1): array
+    private function getPaginatedDocuments(string $cacheKey, int $limit, array $relations = [], ?int $userId = null): array
     {
-        $dynamicKey = "{$this->cacheKey}_page_{$page}_per_{$perPage}";
+        return Cache::remember($cacheKey, now()->addHours(1), function () use ($limit, $relations, $userId) {
+            $paginator = Document::with($relations)->when($userId, fn ($query) => $query->where('user_id', $userId))
+                ->latest()->paginate($limit);
 
-        return Cache::remember($dynamicKey, now()->addHours(1), function () use ($perPage) {
-            $paginator = Document::with(['project', 'files', 'applicant'])->latest()->paginate($perPage);
-
-            return [
-                'items' => array_map(fn ($item) => $item->toArray(), $paginator->items()),
-                'total' => $paginator->total(),
-                'perPage' => $paginator->perPage(),
-                'currentPage' => $paginator->currentPage(),
-                'lastPage' => $paginator->lastPage(),
-            ];
+            return PaginationHelper::format($paginator);
         });
     }
 
-    public function showDocumentByApplicant(int $userId, int $perPage = 10, int $page = 1): array
+    public function showDocumentByAdmin(int $limit = 10, int $page = 1): array
     {
-        $dynamicKey = "{$this->cacheKey}_user_{$userId}_page_{$page}_per_{$perPage}";
+        return $this->getPaginatedDocuments(
+            cacheKey: "{$this->cacheKey}_page_{$page}_per_{$limit}",
+            limit: $limit,
+            relations: ['files', 'user']
+        );
+    }
 
-        return Cache::remember($dynamicKey, now()->addHours(1), function () use ($userId, $perPage) {
-            $paginator = Document::with(['project', 'files'])->where('applicant_id', $userId)->latest()->paginate($perPage);
-
-            return [
-                'items' => array_map(fn ($item) => $item->toArray(), $paginator->items()),
-                'total' => $paginator->total(),
-                'perPage' => $paginator->perPage(),
-                'currentPage' => $paginator->currentPage(),
-                'lastPage' => $paginator->lastPage(),
-            ];
-        });
+    public function showDocumentByUser(int $userId, int $limit = 10, int $page = 1): array
+    {
+        return $this->getPaginatedDocuments(
+            cacheKey: "{$this->cacheKey}_user_{$userId}_page_{$page}_per_{$limit}",
+            limit: $limit,
+            relations: ['files'],
+            userId: $userId
+        );
     }
 
     public function createRequest(array $data, array $files, User $user): Document
     {
         $result = DB::transaction(function () use ($data, $files, $user) {
-            $registrationNumber = 'REG-'.now()->format('Ymd').'-'.strtoupper(Str::random(5));
+            $registrationNumber = DocumentHelper::registrationNumber();
 
             $request = Document::create([
                 'number_registration' => $registrationNumber,
-                'applicant_id' => $user->id,
-                'project_id' => $data['project_id'],
+                'user_id' => $user->id,
                 'title' => $data['title'],
                 'description' => $data['description'] ?? null,
                 'status' => 'submitted',
@@ -100,17 +95,17 @@ class DocumentService
         // ProcessDocumentJob::dispatch($result, 'created');
 
         // Notifikasi & Reverb Broadcast
-        $verificators = User::role('verificator', 'api')->get();
+        $admin = User::role('admin', 'api')->get();
         // Notification::send($verificators, new DocumentStatusUpdatedNotification($result, 'submitted'));
 
         DocumentSubmittedEvent::dispatch(
             $result, "Applicant has make a document request {$result->title}."
         );
 
-        return $result->load(['project', 'files']);
+        return $result->load(['files']);
     }
 
-    public function updateByApplicant(Document $document, array $data, ?array $files, User $user): Document
+    public function updateByUser(Document $document, array $data, ?array $files, User $user): Document
     {
         DB::transaction(function () use ($document, $data, $files, $user) {
             $document->update([
@@ -141,7 +136,7 @@ class DocumentService
             $document->approvalLogs()->create([
                 'actor_id' => $user->id,
                 'status' => 'submitted',
-                'notes' => 'Applicant has resubmitted document request.',
+                'notes' => 'User has resubmitted document request.',
             ]);
 
         });
@@ -149,22 +144,22 @@ class DocumentService
         $this->clearDocumentCache();
         $this->logService->clearLogCache();
 
-        DocumentResubmittedEvent::dispatch(
-            $document, "Applicant has updated and resubmitted the document {$document->title}."
-        );
+        // DocumentResubmittedEvent::dispatch(
+        //     $document, "Applicant has updated and resubmitted the document {$document->title}."
+        // );
 
-        return $document->load(['project', 'files']);
+        return $document->load(['files']);
     }
 
-    public function updateByVerificator(Document $document, array $data, User $verificator): Document
+    public function updateByAdmin(Document $document, array $data, User $admin): Document
     {
-        DB::transaction(function () use ($document, $data, $verificator) {
+        DB::transaction(function () use ($document, $data, $admin) {
             $newStatus = $data['status'];
 
             $updateData = [
                 'status' => $newStatus,
-                'verificator_id' => $verificator->id,
-                'verificator_notes' => $data['verificator_notes'] ?? null,
+                'admin_id' => $admin->id,
+                'admin_notes' => $data['admin_notes'] ?? null,
             ];
 
             if ($newStatus === 'approved') {
@@ -174,7 +169,7 @@ class DocumentService
             $document->update($updateData);
 
             $document->approvalLogs()->create([
-                'actor_id' => $verificator->id,
+                'actor_id' => $admin->id,
                 'status' => $newStatus,
                 'notes' => 'Document status was updated.',
             ]);
@@ -185,9 +180,9 @@ class DocumentService
         $this->logService->clearLogCache();
 
         DocumentStatusUpdatedEvent::dispatch(
-            $document, "Verificator has updated status document {$document->title}."
+            $document, "Admin has updated status document {$document->title}."
         );
 
-        return $document->load(['project', 'approvalLogs', 'verificator']);
+        return $document->load(['approvalLogs', 'admin']);
     }
 }

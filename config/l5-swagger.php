@@ -84,6 +84,9 @@ return [
                 'doc_expansion' => env('L5_SWAGGER_UI_DOC_EXPANSION', 'list'),
                 'filter' => env('L5_SWAGGER_UI_FILTERS', false),
             ],
+            'options' => [
+                'schema_sorter' => 'none',
+            ],
             'authorization' => [
                 'persist_authorization' => env('L5_SWAGGER_UI_PERSIST_AUTHORIZATION', true),
                 'oauth2' => [

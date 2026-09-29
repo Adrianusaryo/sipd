@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('documents_files', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('applicant_id')->constrained('documents')->cascadeOnDelete();
+            $table->foreignId('document_id')->constrained('documents')->cascadeOnDelete();
 
             $table->string('document_type');
             $table->string('file_path');
@@ -23,7 +23,7 @@ return new class extends Migration
             $table->integer('version')->default(1);
             $table->timestamps();
 
-            $table->index('applicant_id');
+            $table->index('document_id');
         });
     }
 

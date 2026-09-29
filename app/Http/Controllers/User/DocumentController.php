@@ -1,27 +1,26 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\User;
 
-use App\Http\Requests\Project\ProjectRequest;
-use App\Http\Requests\Project\ProjectUpdateRequest;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Document\DocumentRequest;
+use App\Http\Requests\Document\DocumentUpdateByApplicant;
 use App\Http\Response\ApiResponse;
-use App\Models\Project;
-use App\Services\ProjectService;
+use App\Models\Document;
+use App\Services\DocumentService;
+use App\Swagger\ApiErrorDoc;
 use App\Swagger\ApiPaginationDoc;
-use App\Swagger\ApiSuccessDoc;
-use App\Swagger\JsonSchemaRef;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
-class ProjectController extends Controller
+class DocumentController extends Controller
 {
-    public function __construct(protected ProjectService $project_service) {}
+    public function __construct(protected DocumentService $document_service) {}
 
-    // Show Project
     #[OA\Get(
-        path: '/projects',
-        tags: ['Project'],
+        path: '/documents/applicant',
+        tags: ['Applicant'],
         security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(name: 'page', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 1)),
@@ -29,106 +28,99 @@ class ProjectController extends Controller
             new OA\Parameter(name: 'search', in: 'query', required: false, schema: new OA\Schema(type: 'string')),
         ],
         responses: [
-            new ApiPaginationDoc(200, 'success show all project', [
+            new ApiPaginationDoc(200, 'success get all project', [
                 new OA\Property(property: 'id', type: 'integer', example: '1'),
                 new OA\Property(property: 'code_project', type: 'string', example: 'PRJ-20260827-WL0R'),
                 new OA\Property(property: 'title', type: 'string', example: 'Kampung Nelayan Merah Putih'),
                 new OA\Property(property: 'description', type: 'string', example: 'Pengajuan izin analisis dampak pembangunan program Kampung Nelayan Merah Putih.'),
             ]),
+            new ApiErrorDoc(422, 'Unprocessable Entity'),
         ]
     )]
     public function index(Request $request): JsonResponse
     {
-        $perPage = (int) $request->query('per_page', 10);
+        $limit = (int) $request->query('limit', 10);
         $page = (int) $request->query('page', 1);
-        $result = $this->project_service->showProject($perPage, $page);
+        $result = $this->document_service->showDocumentByUser($request->user()->id, $limit, $page);
 
-        return ApiResponse::pagination($result, 'success show all projects', 200);
+        return ApiResponse::pagination($result, 'success show all document', 200);
     }
 
-    // Store Project
+    // Store
     #[OA\Post(
-        path: '/projects',
-        tags: ['Project'],
+        path: '/documents',
+        tags: ['Applicant'],
         security: [['bearerAuth' => []]],
         requestBody: new OA\RequestBody(
             required: true,
-            content: new JsonSchemaRef('ProjectRequest')
+            content: new OA\MediaType(
+                mediaType: 'multipart/form-data',
+                schema: new OA\Schema(ref: '#/components/schemas/DocumentRequest')
+            )
         ),
         responses: [
-            new ApiSuccessDoc(201, 'create project success', [
+            new ApiPaginationDoc(200, 'success get all project', [
                 new OA\Property(property: 'id', type: 'integer', example: '1'),
-                new OA\Property(property: 'code_project', type: 'string', example: 'PRJ-20260827-WL0R'),
                 new OA\Property(property: 'title', type: 'string', example: 'Kampung Nelayan Merah Putih'),
                 new OA\Property(property: 'description', type: 'string', example: 'Pengajuan izin analisis dampak pembangunan program Kampung Nelayan Merah Putih.'),
             ]),
+            new ApiErrorDoc(422, 'Unprocessable Entity'),
         ]
     )]
-    public function store(ProjectRequest $request)
+    public function store(DocumentRequest $request): JsonResponse
     {
-        $result = $this->project_service->createProject($request->validated());
+        $data = $request->validated();
 
-        if (! $result) {
-            return ApiResponse::error(null, 'please follow the rule', 500);
-        }
+        $files = $request->file('files');
 
-        return ApiResponse::success($result, 'success create project', 201);
+        $user = $request->user();
+
+        $result = $this->document_service->createRequest($data, $files, $user);
+
+        return ApiResponse::success($result, 'success create document', 201);
     }
 
-    // Update Project
+    // Updated by User
     #[OA\Put(
-        path: '/projects/{id}',
-        tags: ['Project'],
+        path: '/documents/{document}/applicant',
+        tags: ['Applicant'],
         security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
-                name: 'id',
+                name: 'document',
                 in: 'path',
                 required: true,
-                schema: new OA\Schema(type: 'integer', example: 1)
+                description: 'ID Dokumen yang sedang direvisi',
+                schema: new OA\Schema(type: 'integer', example: 3)
             ),
         ],
         requestBody: new OA\RequestBody(
             required: true,
-            content: new JsonSchemaRef('ProjectRequest')
+            content: new OA\MediaType(
+                mediaType: 'multipart/form-data',
+                schema: new OA\Schema(ref: '#/components/schemas/DocumentRequest')
+            )
         ),
         responses: [
-            new ApiSuccessDoc(201, 'success update project', [
+            new ApiPaginationDoc(200, 'success get all project', [
                 new OA\Property(property: 'id', type: 'integer', example: '1'),
                 new OA\Property(property: 'code_project', type: 'string', example: 'PRJ-20260827-WL0R'),
                 new OA\Property(property: 'title', type: 'string', example: 'Kampung Nelayan Merah Putih'),
                 new OA\Property(property: 'description', type: 'string', example: 'Pengajuan izin analisis dampak pembangunan program Kampung Nelayan Merah Putih.'),
             ]),
+            new ApiErrorDoc(422, 'Unprocessable Entity'),
         ]
     )]
-    public function update(ProjectUpdateRequest $request, Project $project)
+    public function update(DocumentUpdateByApplicant $request, Document $document): JsonResponse
     {
-        $result = $this->project_service->updateProject($project, $request->validated());
+        $data = $request->validated();
 
-        return ApiResponse::success($result, 'success update project', 200);
-    }
+        $user = $request->user();
 
-    // Remove Project
-    #[OA\Delete(
-        path: '/projects/{id}',
-        tags: ['Project'],
-        security: [['bearerAuth' => []]],
-        parameters: [
-            new OA\Parameter(
-                name: 'id',
-                in: 'path',
-                required: true,
-                schema: new OA\Schema(type: 'integer', example: 1)
-            ),
-        ],
-        responses: [
-            new ApiSuccessDoc(201, 'success remove project'),
-        ]
-    )]
-    public function remove(Project $project)
-    {
-        $this->project_service->removeProject($project);
+        $files = $request->file('files');
 
-        return ApiResponse::success(null, 'success remove project', 200);
+        $result = $this->document_service->updateByUser($document, $data, $files, $user);
+
+        return ApiResponse::success($result, 'success update document', 200);
     }
 }

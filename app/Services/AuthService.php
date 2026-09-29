@@ -12,7 +12,7 @@ class AuthService
     {
         return DB::transaction(function () use ($data) {
             $user = User::create([
-                'name' => $data['name'],
+                'username' => $data['username'],
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
                 'nip_nik' => $data['nip_nik'],
@@ -27,7 +27,7 @@ class AuthService
 
     public function login(array $data)
     {
-        $user = User::where('email', $data['identifier'])->orWhere('name', $data['identifier'])->orWhere('nip_nik', $data['identifier'])->first();
+        $user = User::where('email', $data['identifier'])->orWhere('username', $data['identifier'])->orWhere('nip_nik', $data['identifier'])->first();
 
         if (! $user || ! Hash::check($data['password'], $user->password)) {
             return null;
@@ -37,6 +37,7 @@ class AuthService
         $token = $user->createToken('auth_token_sipd')->plainTextToken;
 
         return [
+            'user' => $user,
             'permissions' => $user->getAllPermissions()->pluck('name'),
             'token' => $token,
         ];

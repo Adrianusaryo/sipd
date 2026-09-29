@@ -16,27 +16,27 @@ class ApprovalLogsService
         DB::table('cache')->where('key', 'like', config('cache.prefix').$this->cacheKey.'%')->delete();
     }
 
-    public function getLogsByUser(User $user, int $page = 1, int $perPage = 10): array
+    public function getLogsByUser(User $user, int $page = 1, int $limit = 10): array
     {
-        $role = $user->hasRole('applicant', 'api') ? "applicant_{$user->id}" : 'verificator_all';
+        $role = $user->hasRole('user', 'api') ? "user_{$user->id}" : 'admin';
 
-        $dynamicKey = "{$this->cacheKey}_{$role}_page_{$page}_per_{$perPage}";
+        $dynamicKey = "{$this->cacheKey}_{$role}_page_{$page}_per_{$limit}";
 
-        return Cache::remember($dynamicKey, now()->addHours(1), function () use ($user, $perPage) {
+        return Cache::remember($dynamicKey, now()->addHours(1), function () use ($user, $limit) {
             $query = ApprovalLog::with(['document:id,title,number_registration', 'actor:id,name,email'])->latest();
 
-            if ($user->hasRole('applicant', 'api')) {
+            if ($user->hasRole('user', 'api')) {
                 $query->whereHas('document', function ($q) use ($user) {
-                    $q->where('applicant_id', $user->id);
+                    $q->where('user_id', $user->id);
                 });
             }
 
-            $paginator = $query->paginate($perPage);
+            $paginator = $query->paginate($limit);
 
             return [
                 'items' => array_map(fn ($item) => $item->toArray(), $paginator->items()),
-                'total' => $paginator->total(),
-                'perPage' => $paginator->perPage(),
+                'limit' => $paginator->total(),
+                'page' => $paginator->perPage(),
                 'currentPage' => $paginator->currentPage(),
                 'lastPage' => $paginator->lastPage(),
             ];
