@@ -9,10 +9,10 @@ class ApiPaginationDoc extends OA\Response
     public function __construct(
         int $status = 200,
         string $message = 'pagination',
-        ?array $data = null
+        ?JsonSchemaRef $data = null
     ) {
-        $dataContent = $data !== null ? new OA\Items(type: 'object', properties: $data)
-            : new OA\Items(type: 'object');
+        $dataContent = $data !== null ? new OA\Items( ref: $data->schemaRef)
+            : new OA\Items( type: 'object');
 
         parent::__construct(
             response: $status,

@@ -9,10 +9,10 @@ class ApiSuccessDoc extends OA\Response
     public function __construct(
         int $status = 200,
         string $message = 'success',
-        ?array $data = null
+        ?JsonSchemaRef $data = null
     ) {
-        $dataProperty = $data !== null ? new OA\Property(property: 'data', type: 'object', properties: $data) :
-        new OA\Property(property: 'data', type: 'object', nullable: true, example: null);
+        $dataContent = $data !== null ? new OA\Property(property : 'data', ref: $data->schemaRef)
+        : new OA\Property(property: 'data', type: 'object', nullable:true);
 
         parent::__construct(
             response: $status,
@@ -27,7 +27,7 @@ class ApiSuccessDoc extends OA\Response
                             new OA\Property(property: 'message', type: 'string', example: $message),
                         ]
                     ),
-                    $dataProperty,
+                    $dataContent,
                 ]
             )
         );

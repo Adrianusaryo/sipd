@@ -8,7 +8,7 @@ use OpenApi\Attributes as OA;
 #[OA\Schema(
     schema: 'LoginRequest',
     title: 'Login Request',
-    description: false,
+    type:'object',
     properties: [
         new OA\Property(property: 'identifier', type: 'string', example: 'Joko Widodo'),
         new OA\Property(property: 'password', type: 'string', example: 'Password123$'),

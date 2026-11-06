@@ -37,8 +37,8 @@ class ApiResponse
             ],
             'data' => $result['items'],
             'pagination' => [
-                'total' => $result['total'],
-                'per_page' => $result['perPage'],
+                'limit' => $result['limit'],
+                'page' => $result['page'],
                 'current_page' => $result['currentPage'],
                 'last_page' => $result['lastPage'],
             ],

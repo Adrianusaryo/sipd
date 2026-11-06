@@ -23,7 +23,7 @@ class ApprovalLogsService
         $dynamicKey = "{$this->cacheKey}_{$role}_page_{$page}_per_{$limit}";
 
         return Cache::remember($dynamicKey, now()->addHours(1), function () use ($user, $limit) {
-            $query = ApprovalLog::with(['document:id,title,number_registration', 'actor:id,name,email'])->latest();
+            $query = ApprovalLog::with(['document:id,title,number_registration', 'actor:id,username,email'])->latest();
 
             if ($user->hasRole('user', 'api')) {
                 $query->whereHas('document', function ($q) use ($user) {

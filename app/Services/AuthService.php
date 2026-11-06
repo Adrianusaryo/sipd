@@ -19,7 +19,7 @@ class AuthService
                 'phone' => $data['phone'],
             ]);
 
-            $user->assignRole('applicant');
+            $user->assignRole('user');
 
             return $user;
         });

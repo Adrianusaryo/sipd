@@ -11,7 +11,7 @@ use OpenApi\Attributes as OA;
     contact: new OA\Contact(email: 'admin@sipd_new.test')
 )]
 #[OA\Server(
-    url: 'http://sipd_new.test/api/',
+    url: 'http://be-sipd.test/api/',
     description: 'Local Server'
 )]
 #[OA\Tag(
@@ -20,17 +20,12 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Tag(
-    name: 'Project',
+    name: 'User',
     description: false
 )]
 
 #[OA\Tag(
-    name: 'Applicant',
-    description: false
-)]
-
-#[OA\Tag(
-    name: 'Verificator',
+    name: 'Admin',
     description: false
 )]
 

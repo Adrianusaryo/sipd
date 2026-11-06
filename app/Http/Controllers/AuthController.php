@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\Auth\LoginResource;
+use App\Http\Resources\Auth\RegisterResource;
 use App\Http\Response\ApiResponse;
 use App\Services\AuthService;
 use App\Swagger\ApiErrorDoc;
@@ -27,19 +28,14 @@ class AuthController extends Controller
             content: new JsonSchemaRef('RegisterRequest')
         ),
         responses: [
-            new ApiSuccessDoc(201, 'register success', [
-                new OA\Property(property: 'username', type: 'string', example: 'Joko Widodo'),
-                new OA\Property(property: 'email', type: 'string', example: 'jokowi@gmail.com'),
-                new OA\Property(property: 'nip_nik', type: 'string', example: '199001012020121004'),
-                new OA\Property(property: 'phone', type: 'string', example: '081234567895'),
-            ]),
+            new ApiSuccessDoc(201, 'register success', new JsonSchemaRef('RegisterResource')),
         ]
     )]
     public function register(RegisterRequest $request)
     {
         $result = $this->auth_service->register($request->validated());
 
-        return ApiResponse::success($result, 'register success', 201);
+        return ApiResponse::success(new RegisterResource($result), 'register success', 201);
     }
 
     // Login
@@ -51,10 +47,7 @@ class AuthController extends Controller
             content: new JsonSchemaRef('LoginRequest')
         ),
         responses: [
-            new ApiSuccessDoc(200, 'login success', [
-                new OA\Property(property: 'permissions', type: 'array', items: new OA\Items(type: 'string'), example: ['create-request', 'view-request']),
-                new OA\Property(property: 'token', type: 'string', example: '6|3Kgs2B34mqxB22hmHc9W8N2GYXxwg3OTtWT4I4A84756196e'),
-            ]),
+            new ApiSuccessDoc(200, 'login success',new JsonSchemaRef('LoginResource')),
             new ApiErrorDoc(400, 'login failed, please check your credential'),
         ]
     )]

@@ -17,7 +17,7 @@ use OpenApi\Attributes as OA;
                 new OA\Property(property: 'id', type: 'integer', example: 1),
                 new OA\Property(property: 'name', type: 'string', example: 'Joko Widodo'),
                 new OA\Property(property: 'email', type: 'string', example: 'jokowi@sipd.go.id'),
-                new OA\Property(property: 'roles', type: 'array', items: new OA\Items(type: 'string', example: 'applicant')),
+                new OA\Property(property: 'roles', type: 'array', items: new OA\Items(type: 'string', example: 'user')),
 
             ]
         ),
@@ -42,7 +42,7 @@ class LoginResource extends JsonResource
         return [
             'user' => [
                 'id' => $this->resource['user']->id,
-                'name' => $this->resource['user']->name,
+                'username' => $this->resource['user']->username,
                 'email' => $this->resource['user']->email,
                 'roles' => $this->resource['user']->getRoleNames(),
             ],

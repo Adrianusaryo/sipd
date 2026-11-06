@@ -3,13 +3,18 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Document\DocumentRequest;
-use App\Http\Requests\Document\DocumentUpdateByApplicant;
+use App\Http\Requests\Document\Admin\DocumentUpdateRequest;
+use App\Http\Requests\Document\User\DocumentRequest;
+use App\Http\Resources\Document\User\DocumentResource;
+use App\Http\Resources\Document\User\DocumentStoreResource;
+use App\Http\Resources\Document\User\DocumentSummaryResource;
+use App\Http\Resources\Document\User\DocumentUpdateResource;
 use App\Http\Response\ApiResponse;
 use App\Models\Document;
-use App\Services\DocumentService;
+use App\Services\User\DocumentService;
 use App\Swagger\ApiErrorDoc;
 use App\Swagger\ApiPaginationDoc;
+use App\Swagger\JsonSchemaRef;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
@@ -19,8 +24,24 @@ class DocumentController extends Controller
     public function __construct(protected DocumentService $document_service) {}
 
     #[OA\Get(
-        path: '/documents/applicant',
-        tags: ['Applicant'],
+        path: '/user/documents/summary',
+        tags: ['User'],
+        security: [['bearerAuth' => []]],
+        responses: [
+            new ApiPaginationDoc(200, 'success get all documents', new JsonSchemaRef('UserDocumentSummaryResource')),
+            new ApiErrorDoc(422, 'Unprocessable Entity'),
+        ]
+    )]
+    public function summary(Request $request): JsonResponse
+    {
+        $result = $this->document_service->showSummary($request->user()->id);
+
+        return ApiResponse::success(new DocumentSummaryResource($result), 'success show document summary', 200);
+    }
+
+    #[OA\Get(
+        path: '/user/documents',
+        tags: ['User'],
         security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(name: 'page', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 1)),
@@ -28,12 +49,7 @@ class DocumentController extends Controller
             new OA\Parameter(name: 'search', in: 'query', required: false, schema: new OA\Schema(type: 'string')),
         ],
         responses: [
-            new ApiPaginationDoc(200, 'success get all project', [
-                new OA\Property(property: 'id', type: 'integer', example: '1'),
-                new OA\Property(property: 'code_project', type: 'string', example: 'PRJ-20260827-WL0R'),
-                new OA\Property(property: 'title', type: 'string', example: 'Kampung Nelayan Merah Putih'),
-                new OA\Property(property: 'description', type: 'string', example: 'Pengajuan izin analisis dampak pembangunan program Kampung Nelayan Merah Putih.'),
-            ]),
+            new ApiPaginationDoc(200, 'success get documents', new JsonSchemaRef('UserDocumentResource')),
             new ApiErrorDoc(422, 'Unprocessable Entity'),
         ]
     )]
@@ -41,32 +57,28 @@ class DocumentController extends Controller
     {
         $limit = (int) $request->query('limit', 10);
         $page = (int) $request->query('page', 1);
-        $result = $this->document_service->showDocumentByUser($request->user()->id, $limit, $page);
+        $result = $this->document_service->showDocument($request->user()->id, $limit, $page);
+
+        $result['items'] = DocumentResource::collection($result['items']);
 
         return ApiResponse::pagination($result, 'success show all document', 200);
     }
 
     // Store
     #[OA\Post(
-        path: '/documents',
-        tags: ['Applicant'],
+        path: 'user/documents',
+        tags: ['User'],
         security: [['bearerAuth' => []]],
         requestBody: new OA\RequestBody(
             required: true,
-            content: new OA\MediaType(
-                mediaType: 'multipart/form-data',
-                schema: new OA\Schema(ref: '#/components/schemas/DocumentRequest')
-            )
+            content: new JsonSchemaRef('UserDocumentUpdateRequest','multipart/form-data')
         ),
         responses: [
-            new ApiPaginationDoc(200, 'success get all project', [
-                new OA\Property(property: 'id', type: 'integer', example: '1'),
-                new OA\Property(property: 'title', type: 'string', example: 'Kampung Nelayan Merah Putih'),
-                new OA\Property(property: 'description', type: 'string', example: 'Pengajuan izin analisis dampak pembangunan program Kampung Nelayan Merah Putih.'),
-            ]),
+            new ApiPaginationDoc(200, 'success get all project', new JsonSchemaRef('UserDocumentStoreResource')),
             new ApiErrorDoc(422, 'Unprocessable Entity'),
         ]
     )]
+
     public function store(DocumentRequest $request): JsonResponse
     {
         $data = $request->validated();
@@ -75,43 +87,35 @@ class DocumentController extends Controller
 
         $user = $request->user();
 
-        $result = $this->document_service->createRequest($data, $files, $user);
+        $result = $this->document_service->createDocument($data, $files, $user);
 
-        return ApiResponse::success($result, 'success create document', 201);
+        return ApiResponse::success(new DocumentStoreResource($result), 'success create document', 201);
     }
 
-    // Updated by User
+    // Update
     #[OA\Put(
-        path: '/documents/{document}/applicant',
-        tags: ['Applicant'],
+        path: '/user/documents/{id}',
+        tags: ['User'],
         security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
-                name: 'document',
+                name: 'id',
                 in: 'path',
                 required: true,
-                description: 'ID Dokumen yang sedang direvisi',
                 schema: new OA\Schema(type: 'integer', example: 3)
             ),
         ],
         requestBody: new OA\RequestBody(
             required: true,
-            content: new OA\MediaType(
-                mediaType: 'multipart/form-data',
-                schema: new OA\Schema(ref: '#/components/schemas/DocumentRequest')
-            )
+            content: new JsonSchemaRef('UserDocumentUpdateRequest','multipart/form-data')
         ),
         responses: [
-            new ApiPaginationDoc(200, 'success get all project', [
-                new OA\Property(property: 'id', type: 'integer', example: '1'),
-                new OA\Property(property: 'code_project', type: 'string', example: 'PRJ-20260827-WL0R'),
-                new OA\Property(property: 'title', type: 'string', example: 'Kampung Nelayan Merah Putih'),
-                new OA\Property(property: 'description', type: 'string', example: 'Pengajuan izin analisis dampak pembangunan program Kampung Nelayan Merah Putih.'),
-            ]),
+            new ApiPaginationDoc(200, 'success get all project', new JsonSchemaRef('UserDocumentUpdateResource')),
             new ApiErrorDoc(422, 'Unprocessable Entity'),
         ]
     )]
-    public function update(DocumentUpdateByApplicant $request, Document $document): JsonResponse
+
+    public function update(DocumentUpdateRequest $request, Document $id): JsonResponse
     {
         $data = $request->validated();
 
@@ -119,8 +123,8 @@ class DocumentController extends Controller
 
         $files = $request->file('files');
 
-        $result = $this->document_service->updateByUser($document, $data, $files, $user);
+        $result = $this->document_service->updateDocument($id, $data, $files, $user);
 
-        return ApiResponse::success($result, 'success update document', 200);
+        return ApiResponse::success(new DocumentUpdateResource($result), 'success update document', 200);
     }
 }

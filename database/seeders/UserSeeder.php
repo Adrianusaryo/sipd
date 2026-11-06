@@ -56,5 +56,17 @@ class UserSeeder extends Seeder
             ]
         );
         $user->syncRoles([$roleUser]);
+
+        $user = User::firstOrCreate(
+            ['email' => 'elizabeth@sipd.go.id'],
+            [
+                'username' => 'Elizabeth',
+                'password' => Hash::make('angel123'),
+                'nip_nik' => '3173012345670003',
+                'phone' => '085712345679',
+            ]
+        );
+        $user->syncRoles([$roleUser]);
+
     }
 }

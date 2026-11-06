@@ -3,7 +3,6 @@
 use App\Http\Controllers\Admin\DocumentController as AdminDocumentController;
 use App\Http\Controllers\ApprovalLogController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\User\DocumentController;
 use App\Http\Controllers\User\DocumentController as UserDocumentController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,17 +14,19 @@ Route::prefix('auth')->group(function () {
 
 Route::middleware('auth:sanctum')->group(function () {
 
-    Route::get('/approval-logs', [ApprovalLogController::class, 'hello']);
+    Route::get('/approval-logs', [ApprovalLogController::class, 'index']);
 
-    Route::prefix('documents')->group(function () {
+    Route::prefix('user/documents')->middleware('role:user')->group(function () {
         Route::get('/', [UserDocumentController::class, 'index']);
+        Route::get('/summary', [UserDocumentController::class, 'summary']);
         Route::post('/', [UserDocumentController::class, 'store']);
-        Route::put('/{document}', [UserDocumentController::class, 'update']);
-    })->middleware('role:user');
+        Route::put('/{id}', [UserDocumentController::class, 'update']);
+    });
 
-    Route::prefix('documents')->group(function () {
+    Route::prefix('admin/documents')->middleware('role:admin')->group(function () {
         Route::get('/', [AdminDocumentController::class, 'index']);
-        Route::put('/{document}', [DocumentController::class, 'update']);
-        Route::get('/export', [DocumentController::class, 'export']);
-    })->middleware('role:admin');
+        Route::get('/summary', [AdminDocumentController::class, 'summary']);
+        Route::put('/{id}', [AdminDocumentController::class, 'update']);
+        // Route::get('/export', [DocumentController::class, 'export']);
+    });
 });
