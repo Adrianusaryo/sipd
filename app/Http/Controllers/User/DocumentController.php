@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Document\Admin\DocumentUpdateRequest;
 use App\Http\Requests\Document\User\DocumentRequest;
+use App\Http\Resources\Document\Admin\DocumentResource as AdminDocumentResource;
 use App\Http\Resources\Document\User\DocumentResource;
 use App\Http\Resources\Document\User\DocumentStoreResource;
 use App\Http\Resources\Document\User\DocumentSummaryResource;
@@ -53,15 +54,39 @@ class DocumentController extends Controller
             new ApiErrorDoc(422, 'Unprocessable Entity'),
         ]
     )]
-    public function index(Request $request): JsonResponse
+    public function findAllDocuments(Request $request): JsonResponse
     {
         $limit = (int) $request->query('limit', 10);
         $page = (int) $request->query('page', 1);
-        $result = $this->document_service->showDocument($request->user()->id, $limit, $page);
+        $result = $this->document_service->findAllDocument($request->user()->id, $limit, $page);
 
         $result['items'] = DocumentResource::collection($result['items']);
 
         return ApiResponse::pagination($result, 'success show all document', 200);
+    }
+
+     #[OA\Get(
+        path: '/user/documents/{id}',
+        tags: ['User'],
+        security: [['bearerAuth' => []]],
+          parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer', example: 1)
+            ),
+        ],
+        responses: [
+            new ApiPaginationDoc(200, 'success get document', new JsonSchemaRef('UserDocumentDetailResource')),
+            new ApiErrorDoc(422, 'Unprocessable Entity'),
+        ]
+    )]
+    public function findDocument(Document $id): JsonResponse
+    {
+        $result = $this->document_service->findDocument($id);
+
+        return ApiResponse::success(new AdminDocumentResource($result), 'success show document', 200);
     }
 
     // Store

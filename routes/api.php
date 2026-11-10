@@ -17,16 +17,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/approval-logs', [ApprovalLogController::class, 'index']);
 
     Route::prefix('user/documents')->middleware('role:user')->group(function () {
-        Route::get('/', [UserDocumentController::class, 'index']);
+        Route::get('/', [UserDocumentController::class, 'findAllDocuments']);
+        Route::get('/{id}', [UserDocumentController::class, 'findDocument']);
         Route::get('/summary', [UserDocumentController::class, 'summary']);
         Route::post('/', [UserDocumentController::class, 'store']);
         Route::put('/{id}', [UserDocumentController::class, 'update']);
     });
 
     Route::prefix('admin/documents')->middleware('role:admin')->group(function () {
-        Route::get('/', [AdminDocumentController::class, 'index']);
+        Route::get('/', [AdminDocumentController::class, 'findAllDocuments']);
+        Route::get('/{id}', [AdminDocumentController::class, 'findDocument']);
         Route::get('/summary', [AdminDocumentController::class, 'summary']);
         Route::put('/{id}', [AdminDocumentController::class, 'update']);
-        // Route::get('/export', [DocumentController::class, 'export']);
     });
 });

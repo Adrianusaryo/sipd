@@ -32,7 +32,7 @@ class DocumentService
         });
     }
 
-    public function showDocument(int $userId, int $limit = 10, int $page = 1): array
+    public function findAllDocument(int $userId, int $limit = 10, int $page = 1): array
     {
         return $this->getPaginatedDocuments(
             cacheKey: "{$this->cacheKey}_user_{$userId}_page_{$page}_per_{$limit}",
@@ -40,6 +40,11 @@ class DocumentService
             relations: ['files'],
             userId: $userId
         );
+    }
+
+    public function findDocument(Document $document) : Document
+    {
+        return $document->load(['files']);
     }
 
     public function showSummary(int $userId): array

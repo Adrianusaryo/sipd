@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Document\Admin\DocumentUpdateRequest;
+use App\Http\Resources\Document\Admin\DocumentDetailResource;
 use App\Http\Resources\Document\Admin\DocumentResource;
 use App\Http\Resources\Document\Admin\DocumentSummaryResource;
 use App\Http\Resources\Document\Admin\DocumentUpdateResource;
@@ -22,6 +23,7 @@ class DocumentController extends Controller
 {
     public function __construct(protected DocumentService $document_service) {}
 
+    // Summary Documents
     #[OA\Get(
         path: '/admin/documents/summary',
         tags: ['Admin'],
@@ -38,7 +40,7 @@ class DocumentController extends Controller
         return ApiResponse::success(new DocumentSummaryResource($result), 'success show document summary', 200);
     }
 
-    // Index
+    // Find All Documents
     #[OA\Get(
         path: '/admin/documents',
         tags: ['Admin'],
@@ -53,18 +55,42 @@ class DocumentController extends Controller
             new ApiErrorDoc(422, 'Unprocessable Entity'),
         ]
     )]
-    public function index(Request $request): JsonResponse
+    public function findAllDocuments(Request $request): JsonResponse
     {
         $limit = (int) $request->query('limit', 10);
         $page = (int) $request->query('page', 1);
-        $result = $this->document_service->showDocument($limit, $page);
+        $result = $this->document_service->findAllDocument($limit, $page);
 
         $result['items'] = DocumentResource::collection($result['items']);
 
         return ApiResponse::pagination($result, 'success show all document', 200);
     }
 
-    // Update By Admin
+    #[OA\Get(
+        path: '/admin/documents/{id}',
+        tags: ['Admin'],
+        security: [['bearerAuth' => []]],
+          parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer', example: 1)
+            ),
+        ],
+        responses: [
+            new ApiPaginationDoc(200, 'success get document', new JsonSchemaRef('AdminDocumentDetailResource')),
+            new ApiErrorDoc(422, 'Unprocessable Entity'),
+        ]
+    )]
+    public function findDocument(Document $id): JsonResponse
+    {
+        $result = $this->document_service->findDocument($id);
+
+        return ApiResponse::success(new DocumentDetailResource($result), 'success find document',200);
+    }
+
+    // Update Document
     #[OA\Put(
         path: '/admin/documents/{id}',
         tags: ['Admin'],

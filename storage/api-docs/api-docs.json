@@ -113,7 +113,7 @@
                 "tags": [
                     "Admin"
                 ],
-                "operationId": "0ca6895135eeef7e9660e6e12a665f43",
+                "operationId": "fd938b88fc26f15d2c928b7efaff9f98",
                 "parameters": [
                     {
                         "name": "page",
@@ -230,6 +230,108 @@
             }
         },
         "/admin/documents/{id}": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "operationId": "9abea1279d070a0066ff2ec892c7ec68",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Response Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "meta": {
+                                            "properties": {
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 200
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "success get document"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/AdminDocumentDetailResource"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 20
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 4
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Response Failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "meta": {
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Unprocessable Entity"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": null,
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
             "put": {
                 "tags": [
                     "Admin"
@@ -586,7 +688,7 @@
                 "tags": [
                     "User"
                 ],
-                "operationId": "7758f97c93c7357919460a58073006ac",
+                "operationId": "2abeb2d168a766852e8e9657ddc8a8ad",
                 "parameters": [
                     {
                         "name": "page",
@@ -702,12 +804,125 @@
                 ]
             }
         },
-        "user/documents": {
-            "post": {
+        "/user/documents/{id}": {
+            "get": {
                 "tags": [
                     "User"
                 ],
-                "operationId": "e5707e2378db45ddda4f9a3fafb3e20c",
+                "operationId": "99dacbb13d1f40606b009756611e990a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Response Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "meta": {
+                                            "properties": {
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 200
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "success get document"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/UserDocumentDetailResource"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 20
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 4
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Response Failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "meta": {
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Unprocessable Entity"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": null,
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "User"
+                ],
+                "operationId": "2369f1d1ab648111f9fc6286e2b651bf",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 3
+                        }
+                    }
+                ],
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -742,7 +957,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/components/schemas/UserDocumentStoreResource"
+                                                "$ref": "#/components/schemas/UserDocumentUpdateResource"
                                             }
                                         },
                                         "pagination": {
@@ -806,23 +1021,12 @@
                 ]
             }
         },
-        "/user/documents/{id}": {
-            "put": {
+        "user/documents": {
+            "post": {
                 "tags": [
                     "User"
                 ],
-                "operationId": "2369f1d1ab648111f9fc6286e2b651bf",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 3
-                        }
-                    }
-                ],
+                "operationId": "e5707e2378db45ddda4f9a3fafb3e20c",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -857,7 +1061,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/components/schemas/UserDocumentUpdateResource"
+                                                "$ref": "#/components/schemas/UserDocumentStoreResource"
                                             }
                                         },
                                         "pagination": {
@@ -1141,6 +1345,73 @@
                 },
                 "type": "object"
             },
+            "AdminDocumentDetailResource": {
+                "properties": {
+                    "document": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "username": {
+                                "type": "string",
+                                "example": "Joko Widodo"
+                            },
+                            "number_registration": {
+                                "type": "string",
+                                "example": "REG-20261102-XT0CH"
+                            },
+                            "title": {
+                                "type": "string",
+                                "example": "Pengajuan Dokumen Karhutla Kalimantan"
+                            },
+                            "description": {
+                                "type": "string",
+                                "example": "Berkas analisis dokumen"
+                            },
+                            "status": {
+                                "type": "string",
+                                "example": "submitted"
+                            },
+                            "submitted_at": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2026-11-05T14:08:29.000000Z"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "files": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "document_id": {
+                                    "type": "integer",
+                                    "example": 1
+                                },
+                                "document_type": {
+                                    "type": "string",
+                                    "example": "attachment"
+                                },
+                                "file_url": {
+                                    "type": "string",
+                                    "example": "http://localhost:8000/storage/attachment/sample.png"
+                                },
+                                "file_name": {
+                                    "type": "string",
+                                    "example": "Screenshot 2026-11-05.png"
+                                },
+                                "version": {
+                                    "type": "integer",
+                                    "example": 1
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            },
             "AdminDocumentResource": {
                 "properties": {
                     "id": {
@@ -1200,6 +1471,78 @@
                     "admin_notes": {
                         "type": "string",
                         "example": "Dokumen sudah lengkap dan disetujui."
+                    }
+                },
+                "type": "object"
+            },
+            "UserDocumentDetailResource": {
+                "properties": {
+                    "document": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "number_registration": {
+                                "type": "string",
+                                "example": "REG-20261102-XT0CH"
+                            },
+                            "title": {
+                                "type": "string",
+                                "example": "Pengajuan Dokumen Karhutla Kalimantan"
+                            },
+                            "notes": {
+                                "type": "string",
+                                "example": "Dokumen sudah disetujui"
+                            },
+                            "description": {
+                                "type": "string",
+                                "example": "Berkas analisis dokumen"
+                            },
+                            "status": {
+                                "type": "string",
+                                "example": "approved"
+                            },
+                            "submitted_at": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2026-11-05T14:08:29.000000Z"
+                            },
+                            "approved_at": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2026-11-07T14:08:29.000000Z"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "files": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "document_id": {
+                                    "type": "integer",
+                                    "example": 1
+                                },
+                                "document_type": {
+                                    "type": "string",
+                                    "example": "attachment"
+                                },
+                                "file_url": {
+                                    "type": "string",
+                                    "example": "http://localhost:8000/storage/attachment/sample.png"
+                                },
+                                "file_name": {
+                                    "type": "string",
+                                    "example": "Screenshot 2026-11-05.png"
+                                },
+                                "version": {
+                                    "type": "integer",
+                                    "example": 1
+                                }
+                            },
+                            "type": "object"
+                        }
                     }
                 },
                 "type": "object"
