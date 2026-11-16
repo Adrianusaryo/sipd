@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Document\Admin\DocumentUpdateRequest;
 use App\Http\Requests\Document\User\DocumentRequest;
-use App\Http\Resources\Document\Admin\DocumentResource as AdminDocumentResource;
+use App\Http\Requests\Document\User\DocumentUpdateRequest;
+use App\Http\Resources\Document\User\DocumentDetailResource;
 use App\Http\Resources\Document\User\DocumentResource;
 use App\Http\Resources\Document\User\DocumentStoreResource;
 use App\Http\Resources\Document\User\DocumentSummaryResource;
@@ -82,11 +82,11 @@ class DocumentController extends Controller
             new ApiErrorDoc(422, 'Unprocessable Entity'),
         ]
     )]
-    public function findDocument(Document $id): JsonResponse
+    public function findDocument(Document $document): JsonResponse
     {
-        $result = $this->document_service->findDocument($id);
+        $result = $this->document_service->findDocument($document);
 
-        return ApiResponse::success(new AdminDocumentResource($result), 'success show document', 200);
+        return ApiResponse::success(new DocumentDetailResource($result), 'success show document', 200);
     }
 
     // Store
@@ -140,7 +140,7 @@ class DocumentController extends Controller
         ]
     )]
 
-    public function update(DocumentUpdateRequest $request, Document $id): JsonResponse
+    public function update(DocumentUpdateRequest $request, Document $document): JsonResponse
     {
         $data = $request->validated();
 
@@ -148,7 +148,7 @@ class DocumentController extends Controller
 
         $files = $request->file('files');
 
-        $result = $this->document_service->updateDocument($id, $data, $files, $user);
+        $result = $this->document_service->updateDocument($document, $data, $files, $user);
 
         return ApiResponse::success(new DocumentUpdateResource($result), 'success update document', 200);
     }

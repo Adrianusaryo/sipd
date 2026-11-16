@@ -13,6 +13,7 @@ use OpenApi\Attributes as OA;
         new OA\Property(property : 'id', type: 'integer',example:1),
         new OA\Property(property : 'number_registration', type: 'string',example: 'REG-20261102-XT0CH'),
         new OA\Property(property : 'title', type: 'string',example: 'Pengajuan Dokumen Elizabeth'),
+        new OA\Property(property : 'description', type: 'string',example: 'Pengajuan dokumen mengenai karhutla yang sedang terjadi di pulau Kalimantan.'),
         new OA\Property(property : 'admin_notes', type: 'string',example: 'Dokumen sudah diperiksa dan disetujui'),
         new OA\Property(property : 'status', type: 'string',example: 'approved'),
     ]
@@ -31,6 +32,7 @@ class DocumentResource extends JsonResource
             'id' => $this->resource['id'],
             'number_registration' => $this->resource['number_registration'],
             'title' => $this->resource['title'],
+            'description' => $this->resource['description'],
             'admin_notes' => $this->resource['admin_notes'],
             'status' => $this->resource['status']
         ];

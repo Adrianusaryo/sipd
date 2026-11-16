@@ -33,7 +33,7 @@ class DocumentUpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $document = $this->route('id');
+        $document = $this->route('document');
 
         return $this->user()->hasRole('admin', 'api') && $document && $document->status === DocumentStatus::SUBMITTED;
     }

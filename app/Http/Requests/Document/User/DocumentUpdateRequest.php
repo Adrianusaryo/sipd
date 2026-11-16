@@ -76,7 +76,6 @@ class DocumentUpdateRequest extends FormRequest
             'document_type' => ['nullable', 'string', 'max:50'],
             'files' => ['array', 'min:1'],
             'files.*' => [
-                'required',
                 'file',
                 'mimes:pdf,jpg,jpeg,png,docx',
                 'max:5120',

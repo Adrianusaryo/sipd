@@ -83,9 +83,9 @@ class DocumentController extends Controller
             new ApiErrorDoc(422, 'Unprocessable Entity'),
         ]
     )]
-    public function findDocument(Document $id): JsonResponse
+    public function findDocument(Document $document): JsonResponse
     {
-        $result = $this->document_service->findDocument($id);
+        $result = $this->document_service->findDocument($document);
 
         return ApiResponse::success(new DocumentDetailResource($result), 'success find document',200);
     }
@@ -112,13 +112,13 @@ class DocumentController extends Controller
             new ApiErrorDoc(422, 'unprocessable entity'),
         ]
     )]
-    public function update(DocumentUpdateRequest $request, Document $id): JsonResponse
+    public function update(DocumentUpdateRequest $request, Document $document): JsonResponse
     {
         $data = $request->validated();
 
         $user = $request->user();
 
-        $result = $this->document_service->updateDocument($id, $data, $user);
+        $result = $this->document_service->updateDocument($document, $data, $user);
 
         return ApiResponse::success(new DocumentUpdateResource($result), 'success update document status', 200);
     }

@@ -10,6 +10,7 @@ use OpenApi\Attributes as OA;
     schema: "AdminDocumentSummaryResource",
     type:'object',
     properties:[
+        new OA\Property(property : 'total', type: 'integer',example:4),
         new OA\Property(property : 'submitted', type: 'integer',example:1),
         new OA\Property(property : 'revision', type: 'integer',example:0),
         new OA\Property(property : 'approved', type: 'integer',example:2),
@@ -27,6 +28,7 @@ class DocumentSummaryResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'total' => $this->resource['total'],
             'submitted' => $this->resource['submitted'],
             'revision' => $this->resource['revision'],
             'approved' => $this->resource['approved'],

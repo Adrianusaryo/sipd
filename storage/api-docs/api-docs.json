@@ -1561,6 +1561,10 @@
                         "type": "string",
                         "example": "Pengajuan Dokumen Elizabeth"
                     },
+                    "description": {
+                        "type": "string",
+                        "example": "Pengajuan dokumen mengenai karhutla yang sedang terjadi di pulau Kalimantan."
+                    },
                     "admin_notes": {
                         "type": "string",
                         "example": "Dokumen sudah diperiksa dan disetujui"

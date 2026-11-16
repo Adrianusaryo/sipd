@@ -52,7 +52,7 @@ class DocumentDetailResource extends JsonResource
         return [
             'document' => [
                 'id' => $this->id,
-                'username' => $this->user->username,
+                'username' => $this->user->username ?? "Username tidak ada",
                 'number_registration' => $this->number_registration,
                 'title' => $this->title,
                 'description' => $this->description,
